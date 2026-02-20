@@ -39,9 +39,21 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => 
     (localStorage.getItem('theme') as 'light' | 'dark') || 'light'
   );
-  const [lang, setLang] = useState<Language>(() => 
-    (localStorage.getItem('lang') as Language) || 'en'
-  );
+  const [lang, setLang] = useState<Language>(() => {
+    const saved = localStorage.getItem('lang');
+    // If we haven't explicitly set a language yet, or to force Arabic for this transition
+    if (!saved) return 'ar';
+    return saved as Language;
+  });
+
+  // Force Arabic on first load if not already set to 'ar' to ensure user sees the change
+  useEffect(() => {
+    const hasForcedAr = localStorage.getItem('modaber_forced_ar');
+    if (!hasForcedAr) {
+      setLang('ar');
+      localStorage.setItem('modaber_forced_ar', 'true');
+    }
+  }, []);
 
   const t = translations[lang];
 

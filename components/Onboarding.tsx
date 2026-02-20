@@ -278,7 +278,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {fixedFields.map((field) => (
                   <div key={field.id}>
-                    <label className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tighter">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       {t[field.id as keyof typeof t] || field.id}
                       {field.required && <span className="text-rose-500 ml-1">*</span>}
                     </label>
@@ -313,7 +313,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                       <div key={d.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                         <div>
                           <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{d.description}</p>
-                          <p className="text-xs text-slate-400">${d.monthlyAmount}/mo • {d.priority}</p>
+                          <p className="text-xs text-slate-400">{d.monthlyAmount} {t.currency}/mo • {d.priority}</p>
                         </div>
                         <button onClick={() => removeDebt(d.id)} className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
                           <Trash2 className="w-4 h-4" />
@@ -394,7 +394,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                       <div key={e.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                         <div>
                           <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{e.description}</p>
-                          <p className="text-xs text-slate-400">${e.totalAmount}/yr • {e.expectedMonth || 'No month set'}</p>
+                          <p className="text-xs text-slate-400">{e.totalAmount} {t.currency}/yr • {e.expectedMonth || 'No month set'}</p>
                         </div>
                         <button onClick={() => removeAnnual(e.id)} className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
                           <Trash2 className="w-4 h-4" />
@@ -466,9 +466,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {optionalFields.map((field) => (
                   <div key={field.id}>
-                    <label className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tighter">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       {t[field.id as keyof typeof t] || field.id}
-                      <span className="text-[9px] text-slate-300 ml-1 italic font-normal">({t.optional})</span>
+                      <span className="text-[9px] text-slate-400 ml-1 italic font-normal">({t.optional})</span>
                     </label>
                     <input 
                       type="number" 
@@ -546,23 +546,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                         </div>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-500 mb-3">{t.emergencyTarget}</label>
-                  <div className="space-y-2">
-                    <input 
-                      type="range" min="0" max="50" step="5"
-                      value={formData.preferences.emergencyFundPercentage}
-                      onChange={(e) => updatePreference('emergencyFundPercentage', Number(e.target.value))}
-                      className="w-full accent-emerald-600 h-2 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs font-bold text-slate-400">
-                      <span>0%</span>
-                      <span className="text-emerald-600">{formData.preferences.emergencyFundPercentage}%</span>
-                      <span>50%</span>
-                    </div>
                   </div>
                 </div>
               </div>

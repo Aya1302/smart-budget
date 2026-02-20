@@ -7,6 +7,7 @@ export const translations = {
   en: {
     // Nav & General
     dashboard: "Dashboard",
+    appName: "Modaber",
     smartBudget: "Smart Budget",
     pricePredictions: "AI Price Predictions",
     smartShopping: "Smart Shopping",
@@ -196,11 +197,13 @@ export const translations = {
     noAccount: "Don't have an account?",
     hasAccount: "Already have an account?",
     createOne: "Create one",
-    signInHere: "Sign in here"
+    signInHere: "Sign in here",
+    currency: "EGP"
   },
   ar: {
     // Nav & General
     dashboard: "لوحة التحكم",
+    appName: "مُدَبَّر",
     smartBudget: "الميزانية الذكية",
     pricePredictions: "توقعات الأسعار الذكية",
     smartShopping: "التسوق الذكي",
@@ -390,6 +393,7 @@ export const translations = {
     noAccount: "ليس لديك حساب؟",
     hasAccount: "لديك حساب بالفعل؟",
     createOne: "أنشئ حساباً",
-    signInHere: "سجل الدخول هنا"
+    signInHere: "سجل الدخول هنا",
+    currency: "ج.م"
   }
 };

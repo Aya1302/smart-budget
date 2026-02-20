@@ -84,8 +84,8 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
             </h3>
             <p className="text-slate-500 dark:text-slate-400 font-medium">
               {lang === 'en' 
-                ? `Expense of $${completedCost.toFixed(2)} has been added to your monthly log.` 
-                : `تمت إضافة مصاريف بقيمة $${completedCost.toFixed(2)} إلى سجلك الشهري.`}
+                ? `Expense of ${completedCost.toFixed(2)} ${t.currency} has been added to your monthly log.` 
+                : `تمت إضافة مصاريف بقيمة ${completedCost.toFixed(2)} ${t.currency} إلى سجلك الشهري.`}
             </p>
           </div>
         </div>
@@ -148,7 +148,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
                 </div>
                 <div className="text-right">
                   <p className={`font-bold text-lg ${completed.has(idx) ? 'text-slate-400' : 'text-slate-800 dark:text-slate-100'}`}>
-                    ${item.estimatedCost.toFixed(2)}
+                    {item.estimatedCost.toFixed(2)} {t.currency}
                   </p>
                 </div>
               </div>
@@ -174,7 +174,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
               <hr className="border-slate-800" />
               <div className="flex justify-between items-end">
                 <span className="text-sm text-slate-400">{t.totalEst}</span>
-                <span className="text-3xl font-black text-emerald-400">${totalCost.toFixed(0)}</span>
+                <span className="text-3xl font-black text-emerald-400">{totalCost.toFixed(0)} {t.currency}</span>
               </div>
             </div>
 

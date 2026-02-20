@@ -120,7 +120,7 @@ const App: React.FC = () => {
             <Wallet className="text-white w-6 h-6" />
           </div>
           {(isSidebarOpen || isMobileMenuOpen) && (
-            <span className="font-black text-xl text-slate-800 dark:text-white tracking-tight">FinAI</span>
+            <span className="font-black text-xl text-slate-800 dark:text-white tracking-tight">{t.appName}</span>
           )}
         </div>
         {isMobileMenuOpen && (

@@ -193,7 +193,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                   className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
                 />
               ) : (
-                <p className="text-xl font-black text-slate-800 dark:text-slate-100">${profile.monthlySalary}</p>
+                <p className="text-xl font-black text-slate-800 dark:text-slate-100">{t.currency} {profile.monthlySalary}</p>
               )}
             </div>
             <div>
@@ -390,7 +390,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                     className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none text-sm focus:ring-1 focus:ring-emerald-500 dark:text-white"
                   />
                 ) : (
-                  <p className="font-bold text-slate-800 dark:text-slate-100">${(profile.fixedExpenses as any)[field.id] || 0}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{t.currency} {(profile.fixedExpenses as any)[field.id] || 0}</p>
                 )}
               </div>
             ))}
@@ -414,7 +414,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                   <div key={d.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                     <div>
                       <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{d.description}</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${d.monthlyAmount}/mo • {d.priority}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.currency} {d.monthlyAmount}/mo • {d.priority}</p>
                     </div>
                     {isEditing && (
                       <button onClick={() => removeDebt(d.id)} className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg">
@@ -476,7 +476,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                   <div key={e.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                     <div>
                       <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{e.description}</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${e.totalAmount}/yr • {e.expectedMonth || 'No month'}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.currency} {e.totalAmount}/yr • {e.expectedMonth || 'No month'}</p>
                     </div>
                     {isEditing && (
                       <button onClick={() => removeAnnual(e.id)} className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg">
@@ -543,7 +543,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                     className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none text-sm focus:ring-1 focus:ring-emerald-500 dark:text-white"
                   />
                 ) : (
-                  <p className="font-bold text-slate-800 dark:text-slate-100">${(profile.optionalExpenses as any)[field.id] || 0}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{t.currency} {(profile.optionalExpenses as any)[field.id] || 0}</p>
                 )}
               </div>
             ))}

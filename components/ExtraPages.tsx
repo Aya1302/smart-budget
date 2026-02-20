@@ -29,7 +29,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
             <BrainCircuit className="w-10 h-10" />
           </div>
           <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 font-Cairo">
-            {lang === 'en' ? 'How FinAI Works' : 'كيف يعمل فيناي'}
+            {lang === 'en' ? 'How Modaber Works' : 'كيف يعمل مُدَبَّر'}
           </h1>
         </div>
 

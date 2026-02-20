@@ -63,14 +63,14 @@ const PriceForecaster: React.FC<PriceForecasterProps> = ({ profile, lang }) => {
               <div className="flex items-end gap-3">
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">{t.currentPrice}</p>
-                  <p className="font-bold text-slate-500 dark:text-slate-400">${p.currentPrice.toFixed(2)}</p>
+                  <p className="font-bold text-slate-500 dark:text-slate-400">{p.currentPrice.toFixed(2)} {t.currency}</p>
                 </div>
                 <div className={`pb-1 text-slate-300 dark:text-slate-700 ${lang === 'ar' ? 'rotate-180' : ''}`}>
                   <ChevronRight className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">{t.nextMonth}</p>
-                  <p className="text-xl font-black text-slate-800 dark:text-slate-100">${p.predictedPrice.toFixed(2)}</p>
+                  <p className="text-xl font-black text-slate-800 dark:text-slate-100">{p.predictedPrice.toFixed(2)} {t.currency}</p>
                 </div>
               </div>
             </div>

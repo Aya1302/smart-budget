@@ -57,7 +57,7 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{t.smartDistribution}</h2>
           <p className="text-slate-500 dark:text-slate-400">
-            {lang === 'en' ? `AI optimizes your remaining $${totalIncome - totalFixed} after bills.` : `الذكاء الاصطناعي يحسن توزيع الـ $${totalIncome - totalFixed} المتبقية.`}
+            {lang === 'en' ? `AI optimizes your remaining ${totalIncome - totalFixed} ${t.currency} after bills.` : `الذكاء الاصطناعي يحسن توزيع الـ ${totalIncome - totalFixed} ${t.currency} المتبقية.`}
           </p>
         </div>
         <div className="flex gap-2">
@@ -91,7 +91,7 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-slate-800 dark:text-slate-100">${item.amount.toFixed(0)}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{item.amount.toFixed(0)} {t.currency}</p>
                   <p className="text-xs text-slate-400">{lang === 'en' ? 'Target Monthly' : 'المستهدف الشهري'}</p>
                 </div>
               </div>
@@ -122,17 +122,17 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
             <div className="space-y-4 relative z-10">
               <div className="flex justify-between text-sm text-slate-400">
                 <span>{t.totalIncome}</span>
-                <span className="text-white font-bold">${totalIncome}</span>
+                <span className="text-white font-bold">{totalIncome} {t.currency}</span>
               </div>
               <div className="flex justify-between text-sm text-slate-400">
                 <span>{t.fixedCosts}</span>
-                <span className="text-rose-400 font-bold">-${totalFixed}</span>
+                <span className="text-rose-400 font-bold">-{totalFixed} {t.currency}</span>
               </div>
               <hr className="border-slate-800" />
               <div className="flex justify-between items-end">
                 <span className="text-xs font-bold text-slate-500 uppercase">{t.bufferFund}</span>
                 <span className={`text-2xl font-black ${remainingCash < 0 ? 'text-rose-500' : 'text-emerald-400'}`}>
-                  ${remainingCash.toFixed(0)}
+                  {remainingCash.toFixed(0)} {t.currency}
                 </span>
               </div>
             </div>

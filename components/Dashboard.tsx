@@ -5,7 +5,7 @@ import { translations } from '../translations';
 import { 
   TrendingUp, 
   TrendingDown, 
-  DollarSign, 
+  Wallet, 
   Users, 
   ArrowUpRight, 
   AlertCircle,
@@ -54,9 +54,9 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
   ];
 
   const stats = [
-    { label: t.totalIncome, value: `$${totalIncome}`, icon: DollarSign, color: 'emerald' },
-    { label: t.fixedCosts, value: `$${totalFixed}`, icon: TrendingDown, color: 'rose' },
-    { label: t.availableCash, value: `$${availableIncome}`, icon: TrendingUp, color: 'blue' },
+    { label: t.totalIncome, value: `${totalIncome} ${t.currency}`, icon: Wallet, color: 'emerald' },
+    { label: t.fixedCosts, value: `${totalFixed} ${t.currency}`, icon: TrendingDown, color: 'rose' },
+    { label: t.availableCash, value: `${availableIncome} ${t.currency}`, icon: TrendingUp, color: 'blue' },
     { label: t.financialScore, value: `84/100`, icon: Target, color: 'amber' },
   ];
 
@@ -158,13 +158,13 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
               <span className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-bold">
                 <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200" /> {t.fixedCosts}
               </span>
-              <span className="font-black text-slate-800 dark:text-slate-100">${totalFixed}</span>
+              <span className="font-black text-slate-800 dark:text-slate-100">{totalFixed} {t.currency}</span>
             </div>
             <div className="flex justify-between items-center text-sm p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
               <span className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-bold">
                 <div className="w-3 h-3 rounded-full bg-slate-400" /> {t.availableCash}
               </span>
-              <span className="font-black text-slate-800 dark:text-slate-100">${availableIncome}</span>
+              <span className="font-black text-slate-800 dark:text-slate-100">{availableIncome} {t.currency}</span>
             </div>
           </div>
           <div className="mt-8 bg-amber-50 dark:bg-amber-500/10 p-5 rounded-3xl w-full border border-amber-100 dark:border-amber-500/20 flex gap-4 animate-pulse">

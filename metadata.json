@@ -1,5 +1,5 @@
 {
-  "name": "FinAI - Smart Salary & Budget Management",
+  "name": "Modaber - Smart Salary & Budget Management",
   "description": "A professional AI-powered fintech platform for salary management, price prediction, and smart budget optimization.",
   "requestFramePermissions": [
     "geolocation"

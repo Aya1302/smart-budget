@@ -16,7 +16,7 @@ export async function getBudgetOptimization(profile: UserProfile): Promise<Budge
   const priorities = profile.preferences.monthlyPriorities.join(" > ");
 
   const prompt = `
-    As a senior financial advisor, optimize this monthly budget for a person/family with:
+    As a senior financial advisor, optimize this monthly budget (all values in Egyptian Pound - EGP) for a person/family with:
     - Total Monthly Income: ${totalIncome}
     - Family Size: ${profile.familyMembers}
     - Marital Status: ${profile.maritalStatus}
@@ -73,7 +73,7 @@ export async function getBudgetOptimization(profile: UserProfile): Promise<Budge
 
 export async function getPricePredictions(): Promise<PricePrediction[]> {
   const prompt = `
-    Analyze current global and local economic trends to predict price changes for next month for the following commodities:
+    Analyze current global and local economic trends in Egypt to predict price changes (in Egyptian Pound - EGP) for next month for the following commodities:
     1. Bread & Cereals
     2. Fresh Milk
     3. Eggs
@@ -124,7 +124,7 @@ export async function getPricePredictions(): Promise<PricePrediction[]> {
 export async function generateShoppingList(profile: UserProfile, budgetLimit: number): Promise<ShoppingItem[]> {
   const prompt = `
     Generate a smart, optimized monthly grocery shopping list for a family of ${profile.familyMembers}.
-    The total budget for this list must not exceed ${budgetLimit}.
+    The total budget for this list must not exceed ${budgetLimit} EGP.
     Living Cost Level is ${profile.livingCostLevel}.
     Focus on healthy essentials and value-for-money items.
     

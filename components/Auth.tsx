@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Wallet, Mail, Lock, User, ArrowRight, Github, Chrome, Eye, EyeOff, Sun, Moon, Globe, Loader2, ChevronLeft, AlertCircle, CheckCircle2, X, PlusCircle } from 'lucide-react';
+import { Wallet, Mail, Lock, User, ArrowRight, Facebook, Chrome, Eye, EyeOff, Sun, Moon, Globe, Loader2, ChevronLeft, AlertCircle, CheckCircle2, X, PlusCircle } from 'lucide-react';
 import { UserAccount, Language } from '../types';
 import { translations } from '../translations';
 
@@ -12,14 +12,14 @@ interface AuthProps {
   setTheme: (theme: 'light' | 'dark') => void;
 }
 
-const USERS_STORAGE_KEY = 'finai_mock_users';
+const USERS_STORAGE_KEY = 'modaber_mock_users';
 
 const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) => {
   const t = translations[lang];
   const [view, setView] = useState<'login' | 'register' | 'forgot'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null);
-  const [showAccountPicker, setShowAccountPicker] = useState<'Google' | 'Github' | null>(null);
+  const [showAccountPicker, setShowAccountPicker] = useState<'Google' | 'Facebook' | null>(null);
   const [isManualSocial, setIsManualSocial] = useState(false);
   const [manualSocialData, setManualSocialData] = useState({ name: '', email: '' });
   const [isResetSent, setIsResetSent] = useState(false);
@@ -100,7 +100,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
     }
   };
 
-  const startSocialAuth = (provider: 'Google' | 'Github') => {
+  const startSocialAuth = (provider: 'Google' | 'Facebook') => {
     setIsSocialLoading(provider);
     setTimeout(() => {
       setIsSocialLoading(null);
@@ -147,7 +147,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
           <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-in zoom-in duration-300">
             <div className="p-6 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                {showAccountPicker === 'Google' ? <Chrome className="w-5 h-5 text-blue-500" /> : <Github className="w-5 h-5" />}
+                {showAccountPicker === 'Google' ? <Chrome className="w-5 h-5 text-blue-500" /> : <Facebook className="w-5 h-5 text-slate-600 dark:text-slate-400" />}
                 <span className="font-bold text-slate-800 dark:text-slate-100">
                   {isManualSocial ? 'Sign in with different email' : `Sign in with ${showAccountPicker}`}
                 </span>
@@ -231,7 +231,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
             </div>
             
             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 text-[10px] text-slate-400 text-center leading-relaxed">
-              To continue, {showAccountPicker} will share your name, email address, and profile picture with FinAI.
+              To continue, {showAccountPicker} will share your name, email address, and profile picture with {t.appName}.
             </div>
           </div>
         </div>
@@ -279,7 +279,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
               <div className="bg-white p-2 rounded-xl">
                 <Wallet className="w-8 h-8 text-emerald-600" />
               </div>
-              <span className="text-2xl font-black tracking-tight">FinAI</span>
+              <span className="text-2xl font-black tracking-tight">{t.appName}</span>
             </div>
             <h1 className="text-4xl font-black leading-tight mb-4 font-cairo">
               {t.heroTitle}
@@ -295,8 +295,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
               <p className="text-xs font-bold uppercase tracking-wider text-emerald-200">{t.accuracy}</p>
             </div>
             <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
-              <p className="text-2xl font-black">$2.4k</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-emerald-200">{t.avgSavings}</p>
+              <p className="text-2xl font-black">2.4k</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-emerald-200">{t.avgSavings} ({t.currency})</p>
             </div>
           </div>
         </div>
@@ -450,11 +450,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
                 <button 
                   type="button"
                   disabled={isSocialLoading !== null}
-                  onClick={() => startSocialAuth('Github')}
-                  className={`flex items-center justify-center gap-2 border border-slate-100 dark:border-slate-800 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-bold text-slate-600 dark:text-slate-400 ${isSocialLoading === 'Github' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}
+                  onClick={() => startSocialAuth('Facebook')}
+                  className={`flex items-center justify-center gap-2 border border-slate-100 dark:border-slate-800 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-bold text-slate-600 dark:text-slate-400 ${isSocialLoading === 'Facebook' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}
                 >
-                  {isSocialLoading === 'Github' ? <Loader2 className="w-5 h-5 animate-spin" /> : <Github className="w-5 h-5" />} 
-                  Github
+                  {isSocialLoading === 'Facebook' ? <Loader2 className="w-5 h-5 animate-spin" /> : <Facebook className="w-5 h-5 text-slate-600 dark:text-slate-400" />} 
+                  Facebook
                 </button>
               </div>
 

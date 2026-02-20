@@ -82,8 +82,8 @@ const Analytics: React.FC<AnalyticsProps> = ({ profile, lang }) => {
             </div>
             <p className="text-sm text-emerald-100/80 leading-relaxed">
               {lang === 'en' 
-                ? "You saved $300 more than last month. This covers 40% of your next year's medical fund!"
-                : "لقد ادخرت 300 دولار أكثر من الشهر الماضي. هذا يغطي 40٪ من صندوقك الطبي للعام المقبل!"}
+                ? `You saved 300 ${t.currency} more than last month. This covers 40% of your next year's medical fund!`
+                : `لقد ادخرت 300 ${t.currency} أكثر من الشهر الماضي. هذا يغطي 40٪ من صندوقك الطبي للعام المقبل!`}
             </p>
             <button className="w-full py-3 bg-white text-emerald-600 dark:text-emerald-700 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-colors">
               {lang === 'en' ? 'View Achievements' : 'عرض الإنجازات'}

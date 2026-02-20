@@ -28,6 +28,7 @@ export const translations = {
 
     // Onboarding
     financialProfile: "Financial Profile",
+    age: "Age",
     step: "Step",
     of: "of",
     basicInfo: "Basic Info",
@@ -175,7 +176,7 @@ export const translations = {
     successRegister: "Account created successfully!",
     errorUserNotFound: "User not found.",
     errorWrongPassword: "Incorrect password.",
-    heroTitle: "AI-Powered Financial Freedom",
+    heroTitle: "Financial Freedom",
     heroSubtitle: "The smartest way to manage your household budget and planning.",
     accuracy: "Prediction Accuracy",
     avgSavings: "Avg. Monthly Savings",
@@ -224,6 +225,7 @@ export const translations = {
 
     // Onboarding
     financialProfile: "الملف المالي",
+    age: "العمر",
     step: "خطوة",
     of: "من",
     basicInfo: "بيانات أساسية",
@@ -371,7 +373,7 @@ export const translations = {
     successRegister: "تم إنشاء الحساب بنجاح!",
     errorUserNotFound: "المستخدم غير موجود.",
     errorWrongPassword: "كلمة المرور غير صحيحة.",
-    heroTitle: "الحرية المالية بالذكاء الاصطناعي",
+    heroTitle: "الحرية المالية",
     heroSubtitle: "الطريقة الأذكى لإدارة ميزانية وتخطيط الأسرة.",
     accuracy: "دقة التوقعات",
     avgSavings: "متوسط الادخار الشهري",

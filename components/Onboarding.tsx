@@ -17,6 +17,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<Omit<UserProfile, 'account'>>({
     monthlySalary: 6000,
+    age: undefined,
     familyMembers: 1,
     maritalStatus: 'not_specified',
     livingCostLevel: 'Medium',

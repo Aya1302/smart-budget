@@ -31,6 +31,7 @@ export interface UserAccount {
 export interface UserProfile {
   account: UserAccount;
   monthlySalary: number;
+  age?: number;
   familyMembers: number;
   maritalStatus: MaritalStatus;
   livingCostLevel: LivingCostLevel;

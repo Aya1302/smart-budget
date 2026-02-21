@@ -14,7 +14,8 @@ import {
   Moon,
   Globe,
   X,
-  User
+  User,
+  HelpCircle
 } from 'lucide-react';
 import { UserProfile, UserAccount, Language } from './types';
 import { translations } from './translations';
@@ -30,8 +31,14 @@ import ExtraPages from './components/ExtraPages';
 import Profile from './components/Profile';
 
 const App: React.FC = () => {
-  const [account, setAccount] = useState<UserAccount | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [account, setAccount] = useState<UserAccount | null>(() => {
+    const saved = localStorage.getItem('modaber_account');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    const saved = localStorage.getItem('modaber_profile');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -74,10 +81,28 @@ const App: React.FC = () => {
     localStorage.setItem('lang', lang);
   }, [lang]);
 
+  useEffect(() => {
+    if (account) {
+      localStorage.setItem('modaber_account', JSON.stringify(account));
+    } else {
+      localStorage.removeItem('modaber_account');
+    }
+  }, [account]);
+
+  useEffect(() => {
+    if (profile) {
+      localStorage.setItem('modaber_profile', JSON.stringify(profile));
+    } else {
+      localStorage.removeItem('modaber_profile');
+    }
+  }, [profile]);
+
   const handleLogin = (userAccount: UserAccount) => setAccount(userAccount);
   const handleLogout = () => {
     setAccount(null);
     setProfile(null);
+    localStorage.removeItem('modaber_account');
+    localStorage.removeItem('modaber_profile');
     setActiveTab('dashboard');
     setIsMobileMenuOpen(false);
   };
@@ -103,6 +128,7 @@ const App: React.FC = () => {
   const extraNavItems = [
     { id: 'how-it-works', label: t.howItWorks, icon: Info },
     { id: 'privacy', label: t.privacy, icon: ShieldCheck },
+    { id: 'help', label: t.help, icon: HelpCircle },
   ];
 
   if (!account) return <Auth onLogin={handleLogin} lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} />;
@@ -120,6 +146,7 @@ const App: React.FC = () => {
       case 'profile': return <Profile {...props} onUpdate={handleUpdateProfile} />;
       case 'how-it-works': return <ExtraPages type="how" lang={lang} />;
       case 'privacy': return <ExtraPages type="privacy" lang={lang} />;
+      case 'help': return <ExtraPages type="help" lang={lang} />;
       default: return <Dashboard {...props} theme={theme} />;
     }
   };

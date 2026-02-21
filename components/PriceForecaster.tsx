@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, PricePrediction } from '../types';
 import { getPricePredictions } from '../geminiService';
 import { translations, Language } from '../translations';
-import { TrendingUp, TrendingDown, Minus, Clock, ShoppingCart, Percent, ChevronRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Clock, ShoppingCart, Percent, ChevronRight, Sparkles } from 'lucide-react';
 
 interface PriceForecasterProps {
   profile: UserProfile;
@@ -89,9 +89,10 @@ const PriceForecaster: React.FC<PriceForecasterProps> = ({ profile, lang }) => {
                 "{p.advice}"
               </p>
               {p.trend === 'up' && (
-                <button className="w-full py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl text-xs font-bold hover:bg-slate-800 dark:hover:bg-emerald-500 transition-all">
-                  {t.suggestBuy}
-                </button>
+                <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl border border-emerald-100 dark:border-emerald-500/20">
+                  <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{t.suggestBuy}</span>
+                </div>
               )}
             </div>
           </div>

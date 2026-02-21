@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { UserProfile, BudgetAllocation } from '../types';
 import { getBudgetOptimization } from '../geminiService';
 import { translations, Language } from '../translations';
-import { Sparkles, Save, RotateCcw, Loader2 } from 'lucide-react';
+import { Sparkles, Save, RotateCcw, Loader2, Printer } from 'lucide-react';
 
 interface BudgetPlannerProps {
   profile: UserProfile;
@@ -15,6 +15,12 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
   const [allocations, setAllocations] = useState<BudgetAllocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [showSaved, setShowSaved] = useState(false);
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const fetchBudget = useCallback(async (isManual = false) => {
     if (isManual) setIsRefreshing(true);
@@ -30,6 +36,11 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
       setIsRefreshing(false);
     }
   }, [profile]);
+
+  const handleSave = () => {
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 3000);
+  };
 
   useEffect(() => {
     fetchBudget();
@@ -52,7 +63,7 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div id="print-area" className="space-y-8 animate-in fade-in duration-700">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{t.smartDistribution}</h2>
@@ -60,9 +71,20 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
             {lang === 'en' ? `AI optimizes your remaining ${totalIncome - totalFixed} ${t.currency} after bills.` : `الذكاء الاصطناعي يحسن توزيع الـ ${totalIncome - totalFixed} ${t.currency} المتبقية.`}
           </p>
         </div>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-200 dark:shadow-emerald-900/20 hover:scale-105 transition-all">
-            <Save className="w-4 h-4" /> {t.savePlan}
+        <div className="flex gap-2 no-print">
+          <button 
+            onClick={handlePrint}
+            className="p-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+            title={lang === 'en' ? 'Print / Save as PDF' : 'طباعة / حفظ كـ PDF'}
+          >
+            <Printer className="w-5 h-5" />
+          </button>
+          <button 
+            onClick={handleSave}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-200 dark:shadow-emerald-900/20 hover:scale-105 transition-all"
+          >
+            {showSaved ? <Sparkles className="w-4 h-4" /> : <Save className="w-4 h-4" />} 
+            {showSaved ? (lang === 'en' ? 'Saved!' : 'تم الحفظ!') : t.savePlan}
           </button>
         </div>
       </div>
@@ -140,7 +162,7 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
             <button 
               onClick={() => fetchBudget(true)}
               disabled={isRefreshing}
-              className="w-full py-4 bg-emerald-600 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="w-full py-4 bg-emerald-600 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed group no-print"
             >
               <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : 'group-hover:rotate-45 transition-transform'}`} /> 
               {t.recalculate}

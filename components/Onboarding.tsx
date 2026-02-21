@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { UserProfile, MaritalStatus, Language, LivingCostLevel, IncomeStability, SavingPreference, RiskTolerance, Debt, AnnualExpense } from '../types';
 import { translations } from '../translations';
-import { Wallet, Home, Shield, ChevronRight, ChevronLeft, Sun, Moon, Globe, Coffee, ChevronUp, ChevronDown, Plus, Trash2, CreditCard, Calendar } from 'lucide-react';
+import { Wallet, Home, Shield, ChevronRight, ChevronLeft, Sun, Moon, Globe, Coffee, ChevronUp, ChevronDown, Plus, Trash2, CreditCard, Calendar, X } from 'lucide-react';
 
 interface OnboardingProps {
   onComplete: (profile: Omit<UserProfile, 'account'>) => void;
@@ -54,6 +54,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
   });
 
   const [showAnnualForm, setShowAnnualForm] = useState(false);
+  const [customPriority, setCustomPriority] = useState('');
+  const [showCustomPriorityInput, setShowCustomPriorityInput] = useState(false);
   const [newAnnual, setNewAnnual] = useState<Partial<AnnualExpense>>({
     description: '',
     totalAmount: 0,
@@ -132,8 +134,20 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
 
   const nextStep = () => {
     if (step === 1) {
-      if (!formData.monthlySalary || !formData.familyMembers) {
+      const members = Number(formData.familyMembers);
+      const status = formData.maritalStatus;
+
+      if (!formData.monthlySalary || !members) {
         alert(lang === 'en' ? 'Salary and Family Members are required' : 'الراتب وعدد أفراد الأسرة حقول مطلوبة');
+        return;
+      }
+      
+      if (status === 'married' && members === 1) {
+        alert(t.invalidMaritalStatus);
+        return;
+      }
+      if (status === 'single' && members > 1) {
+        alert(t.invalidMaritalStatus);
         return;
       }
     }
@@ -241,7 +255,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-500 mb-2">{t.livingCostLevel}</label>
+                  <label className="block text-sm font-medium text-slate-500 mb-2">{t.livingCostLevel} ({t.optional})</label>
                   <select 
                     value={formData.livingCostLevel}
                     onChange={(e) => updateRootField('livingCostLevel', e.target.value as LivingCostLevel)}
@@ -253,7 +267,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-500 mb-2">{t.incomeStability}</label>
+                  <label className="block text-sm font-medium text-slate-500 mb-2">{t.incomeStability} ({t.optional})</label>
                   <select 
                     value={formData.incomeStability}
                     onChange={(e) => updateRootField('incomeStability', e.target.value as IncomeStability)}
@@ -281,7 +295,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                   <div key={field.id}>
                     <label className="block text-sm font-medium text-slate-500 mb-2">
                       {t[field.id as keyof typeof t] || field.id}
-                      {field.required && <span className="text-rose-500 ml-1">*</span>}
+                      {field.required ? <span className="text-rose-500 ml-1">*</span> : <span className="text-[10px] text-slate-400 ml-1">({t.optional})</span>}
                     </label>
                     <input 
                       type="number" 
@@ -301,10 +315,10 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                     <CreditCard className="w-4 h-4 text-emerald-600" /> {t.debts}
                   </h4>
                   <button 
-                    onClick={() => setShowDebtForm(true)}
+                    onClick={() => setShowDebtForm(!showDebtForm)}
                     className="flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
                   >
-                    <Plus className="w-4 h-4" /> {t.addDebt}
+                    {showDebtForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />} {t.addDebt}
                   </button>
                 </div>
                 
@@ -382,10 +396,10 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                     <Calendar className="w-4 h-4 text-emerald-600" /> {t.annualExpenses}
                   </h4>
                   <button 
-                    onClick={() => setShowAnnualForm(true)}
+                    onClick={() => setShowAnnualForm(!showAnnualForm)}
                     className="flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
                   >
-                    <Plus className="w-4 h-4" /> {t.addAnnual}
+                    {showAnnualForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />} {t.addAnnual}
                   </button>
                 </div>
                 
@@ -522,7 +536,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
 
                 <div>
                   <label className="block text-sm font-medium text-slate-500 mb-3">{t.monthlyPriorities}</label>
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-4">
                     {formData.preferences.monthlyPriorities.map((p, idx) => (
                       <div key={p} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                         <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-3">
@@ -544,9 +558,73 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                           >
                             <ChevronDown className="w-4 h-4" />
                           </button>
+                          <button 
+                            onClick={() => {
+                              const newPriorities = formData.preferences.monthlyPriorities.filter(item => item !== p);
+                              updatePreference('monthlyPriorities', newPriorities);
+                            }}
+                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg text-rose-500"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     ))}
+                  </div>
+                  
+                  {/* Add Priority Section */}
+                  <div className="space-y-3">
+                    {showCustomPriorityInput ? (
+                      <div className="flex gap-2 p-3 bg-white dark:bg-slate-900 rounded-xl border border-emerald-100 dark:border-emerald-500/20 animate-in slide-in-from-top-2">
+                        <input 
+                          type="text" 
+                          autoFocus
+                          placeholder={lang === 'en' ? 'Priority name...' : 'اسم الأولوية...'}
+                          value={customPriority}
+                          onChange={(e) => setCustomPriority(e.target.value)}
+                          className="flex-1 bg-transparent outline-none text-sm dark:text-white"
+                        />
+                        <button 
+                          onClick={() => {
+                            if (customPriority.trim()) {
+                              updatePreference('monthlyPriorities', [...formData.preferences.monthlyPriorities, customPriority.trim()]);
+                              setCustomPriority('');
+                              setShowCustomPriorityInput(false);
+                            }
+                          }}
+                          className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold"
+                        >
+                          {t.addDebt.split(' ')[0]}
+                        </button>
+                        <button onClick={() => setShowCustomPriorityInput(false)} className="p-1 text-slate-400"><X className="w-4 h-4" /></button>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => setShowCustomPriorityInput(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-bold hover:bg-slate-200 transition-all border border-dashed border-slate-300 dark:border-slate-700"
+                      >
+                        <Plus className="w-4 h-4" /> {lang === 'en' ? 'Add Custom Priority' : 'إضافة أولوية مخصصة'}
+                      </button>
+                    )}
+
+                    {['cat_food', 'cat_transport', 'cat_emergency', 'cat_savings', 'cat_invest', 'cat_personal'].filter(p => !formData.preferences.monthlyPriorities.includes(p)).length > 0 && (
+                      <div className="flex flex-wrap gap-2 p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                        {['cat_food', 'cat_transport', 'cat_emergency', 'cat_savings', 'cat_invest', 'cat_personal']
+                          .filter(p => !formData.preferences.monthlyPriorities.includes(p))
+                          .map(p => (
+                            <button
+                              key={p}
+                              onClick={() => {
+                                updatePreference('monthlyPriorities', [...formData.preferences.monthlyPriorities, p]);
+                              }}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 transition-all"
+                            >
+                              <Plus className="w-3 h-3" /> {t[p as keyof typeof t] || p}
+                            </button>
+                          ))
+                        }
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

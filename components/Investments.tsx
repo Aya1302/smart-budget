@@ -12,6 +12,7 @@ interface InvestmentsProps {
 const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
   const t = translations[lang];
   const [enabled, setEnabled] = useState(true);
+  const [showVault, setShowVault] = useState(false);
   
   const options: InvestmentOption[] = [
     {
@@ -44,6 +45,62 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
   const totalIncome = profile.monthlySalary;
   const totalFixed = (Object.values(profile.fixedExpenses) as number[]).reduce((a, b) => a + b, 0);
   const stability = (totalIncome - totalFixed) / totalIncome > 0.2;
+
+  if (showVault) {
+    return (
+      <div className="space-y-8 animate-in fade-in duration-700">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-black text-slate-800 dark:text-slate-100 font-Cairo flex items-center gap-3">
+            <Lock className="w-8 h-8 text-emerald-600" /> {t.investmentVault}
+          </h2>
+          <button 
+            onClick={() => setShowVault(false)}
+            className="px-6 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200 transition-all"
+          >
+            {t.back}
+          </button>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{lang === 'en' ? 'Investment Masterclass' : 'دروس الاستثمار'}</h3>
+            <div className="space-y-4">
+              {[
+                { title: lang === 'en' ? 'Compound Interest' : 'الفائدة المركبة', desc: lang === 'en' ? 'How small savings grow exponentially over time.' : 'كيف تنمو المدخرات الصغيرة بشكل كبير بمرور الوقت.' },
+                { title: lang === 'en' ? 'Diversification' : 'التنويع', desc: lang === 'en' ? 'Spreading risk across different asset classes.' : 'توزيع المخاطر عبر فئات الأصول المختلفة.' },
+                { title: lang === 'en' ? 'Inflation Hedge' : 'التحوط من التضخم', desc: lang === 'en' ? 'Protecting your purchasing power.' : 'حماية قوتك الشرائية.' }
+              ].map((lesson, i) => (
+                <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                  <h4 className="font-bold text-emerald-600 dark:text-emerald-400 mb-1">{lesson.title}</h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{lesson.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-emerald-900 text-white p-8 rounded-[2.5rem] shadow-xl space-y-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full -mr-16 -mt-16 blur-3xl" />
+            <h3 className="text-xl font-bold font-Cairo relative z-10">{lang === 'en' ? 'Your Stability Score' : 'تقييم استقرارك'}</h3>
+            <div className="space-y-4 relative z-10">
+              <div className="flex justify-between items-end">
+                <span className="text-sm text-emerald-200">{lang === 'en' ? 'Monthly Surplus' : 'الفائض الشهري'}</span>
+                <span className="text-2xl font-black">{totalIncome - totalFixed} {t.currency}</span>
+              </div>
+              <div className="w-full bg-emerald-800 h-2 rounded-full overflow-hidden">
+                <div style={{ width: `${Math.min(100, ((totalIncome - totalFixed) / totalIncome) * 100)}%` }} className="h-full bg-white rounded-full" />
+              </div>
+              <p className="text-xs text-emerald-100/60 leading-relaxed italic">
+                {stability 
+                  ? (lang === 'en' ? 'Your profile is stable enough for low-risk investments.' : 'ملفك مستقر بما يكفي للاستثمارات منخفضة المخاطر.')
+                  : (lang === 'en' ? 'Focus on building your emergency fund first.' : 'ركز على بناء صندوق الطوارئ الخاص بك أولاً.')
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -104,9 +161,9 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
               </div>
             </div>
             <div className="p-8 pt-0 mt-auto">
-              <button className="w-full py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-black flex items-center justify-center gap-2 group-hover:bg-emerald-600 dark:group-hover:bg-emerald-500 transition-colors shadow-lg">
-                {lang === 'en' ? 'Investment Portal' : 'بوابة الاستثمار'} <ArrowRight className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} />
-              </button>
+              <div className="w-full py-4 bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center border border-slate-100 dark:border-slate-700">
+                {lang === 'en' ? 'Verified Safe Asset' : 'أصل مالي معتمد آمن'}
+              </div>
             </div>
           </div>
         ))}
@@ -123,7 +180,10 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
               <h3 className="text-2xl font-black font-Cairo">{t.investmentMasterclass}</h3>
               <p className="text-slate-400 dark:text-emerald-100/60 font-medium">{t.learnGrowing}</p>
             </div>
-            <button className="px-10 py-5 bg-white dark:bg-emerald-500 text-slate-900 dark:text-white rounded-3xl font-black hover:bg-emerald-50 dark:hover:bg-emerald-400 transition-all shadow-xl hover:scale-105 active:scale-95">
+            <button 
+              onClick={() => setShowVault(true)}
+              className="px-10 py-5 bg-white dark:bg-emerald-500 text-slate-900 dark:text-white rounded-3xl font-black hover:bg-emerald-50 dark:hover:bg-emerald-400 transition-all shadow-xl hover:scale-105 active:scale-95"
+            >
               {t.investmentVault}
             </button>
           </div>

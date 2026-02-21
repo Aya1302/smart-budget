@@ -35,6 +35,18 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
       alert(lang === 'en' ? 'Salary and Family Members are required' : 'الراتب وعدد أفراد الأسرة حقول مطلوبة');
       return;
     }
+
+    const members = Number(editedProfile.familyMembers);
+    const status = editedProfile.maritalStatus;
+    if (status === 'married' && members === 1) {
+      alert(t.invalidMaritalStatus);
+      return;
+    }
+    if (status === 'single' && members > 1) {
+      alert(t.invalidMaritalStatus);
+      return;
+    }
+
     onUpdate(editedProfile);
     setIsEditing(false);
     setShowSuccess(true);
@@ -211,7 +223,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
               )}
             </div>
             <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.maritalStatus}</label>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.maritalStatus} ({t.optional})</label>
               {isEditing ? (
                 <select 
                   value={editedProfile.maritalStatus}
@@ -227,7 +239,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
               )}
             </div>
             <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.livingCostLevel}</label>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.livingCostLevel} ({t.optional})</label>
               {isEditing ? (
                 <select 
                   value={editedProfile.livingCostLevel}
@@ -243,7 +255,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
               )}
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.incomeStability}</label>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.incomeStability} ({t.optional})</label>
               {isEditing ? (
                 <select 
                   value={editedProfile.incomeStability}
@@ -271,7 +283,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t.savingPriority}</label>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t.savingPriority} ({t.optional})</label>
                 {isEditing ? (
                   <select 
                     value={editedProfile.preferences.savingPriority}
@@ -290,7 +302,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                 )}
               </div>
               <div>
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t.riskTolerance}</label>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t.riskTolerance} ({t.optional})</label>
                 {isEditing ? (
                   <select 
                     value={editedProfile.preferences.riskTolerance}
@@ -379,7 +391,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
               <div key={field.id} className="space-y-1">
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-tighter truncate">
                   {t[field.id as keyof typeof t] || field.id}
-                  {field.required && <span className="text-rose-500 ml-1">*</span>}
+                  {field.required ? <span className="text-rose-500 ml-1">*</span> : <span className="text-[8px] text-slate-400 ml-1">({t.optional})</span>}
                 </label>
                 {isEditing ? (
                   <input 
@@ -534,6 +546,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
               <div key={field.id} className="space-y-1">
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-tighter truncate">
                   {t[field.id as keyof typeof t] || field.id}
+                  <span className="text-[8px] text-slate-400 ml-1">({t.optional})</span>
                 </label>
                 {isEditing ? (
                   <input 

@@ -5,7 +5,7 @@ import { translations, Language } from '../translations';
 import { 
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
-import { Target, Trophy, TrendingUp, History } from 'lucide-react';
+import { Target, Trophy, TrendingUp, History, X } from 'lucide-react';
 
 interface AnalyticsProps {
   profile: UserProfile;
@@ -14,6 +14,8 @@ interface AnalyticsProps {
 
 const Analytics: React.FC<AnalyticsProps> = ({ profile, lang }) => {
   const t = translations[lang];
+  const [showAchievements, setShowAchievements] = React.useState(false);
+
   const data = [
     { month: 'Jan', savings: 400, target: 800, score: 65 },
     { month: 'Feb', savings: 650, target: 800, score: 72 },
@@ -23,8 +25,53 @@ const Analytics: React.FC<AnalyticsProps> = ({ profile, lang }) => {
     { month: 'Jun', savings: 1100, target: 800, score: 91 },
   ];
 
+  const achievements = lang === 'en' ? [
+    { title: "Savings Master", desc: "Saved more than 20% of income for 3 months.", icon: "💰" },
+    { title: "Budget Ninja", desc: "Kept fixed expenses below target for 6 months.", icon: "🥷" },
+    { title: "Smart Shopper", desc: "Reduced grocery spending by 15% using AI list.", icon: "🛒" },
+  ] : [
+    { title: "سيد الادخار", desc: "ادخرت أكثر من 20٪ من الدخل لمدة 3 أشهر.", icon: "💰" },
+    { title: "نينجا الميزانية", desc: "حافظت على المصاريف الثابتة أقل من المستهدف لمدة 6 أشهر.", icon: "🥷" },
+    { title: "المتسوق الذكي", desc: "خفضت الإنفاق على البقالة بنسبة 15٪ باستخدام القائمة الذكية.", icon: "🛒" },
+  ];
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-8 animate-in fade-in duration-700 relative">
+      {showAchievements && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md animate-in zoom-in duration-300 p-4">
+          <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-[3rem] shadow-2xl border border-slate-100 dark:border-slate-800 space-y-6 max-w-2xl w-full relative">
+            <button 
+              onClick={() => setShowAchievements(false)}
+              className="absolute top-6 right-6 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            >
+              <X className="w-6 h-6 text-slate-400" />
+            </button>
+            <div className="text-center space-y-2">
+              <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 mb-4">
+                <Trophy className="w-10 h-10" />
+              </div>
+              <h3 className="text-3xl font-black text-slate-800 dark:text-slate-100 font-Cairo">
+                {lang === 'en' ? 'Your Achievements' : 'إنجازاتك'}
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">
+                {lang === 'en' ? 'Track your financial milestones and progress.' : 'تتبع معالم تقدمك المالي.'}
+              </p>
+            </div>
+            <div className="grid gap-4">
+              {achievements.map((a, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                  <span className="text-3xl">{a.icon}</span>
+                  <div>
+                    <h4 className="font-bold text-slate-800 dark:text-slate-100">{a.title}</h4>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{a.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -85,7 +132,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ profile, lang }) => {
                 ? `You saved 300 ${t.currency} more than last month. This covers 40% of your next year's medical fund!`
                 : `لقد ادخرت 300 ${t.currency} أكثر من الشهر الماضي. هذا يغطي 40٪ من صندوقك الطبي للعام المقبل!`}
             </p>
-            <button className="w-full py-3 bg-white text-emerald-600 dark:text-emerald-700 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-colors">
+            <button 
+              onClick={() => setShowAchievements(true)}
+              className="w-full py-3 bg-white text-emerald-600 dark:text-emerald-700 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-colors"
+            >
               {lang === 'en' ? 'View Achievements' : 'عرض الإنجازات'}
             </button>
           </div>

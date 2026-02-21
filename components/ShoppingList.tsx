@@ -56,6 +56,34 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
     }, 1500);
   };
 
+  const handleShare = async () => {
+    const listText = items.map(item => `${item.name}: ${item.quantity}`).join('\n');
+    const shareData = {
+      title: t.shoppingAssistant,
+      text: listText,
+      url: window.location.href
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(listText);
+        alert(lang === 'en' ? 'List copied to clipboard!' : 'تم نسخ القائمة إلى الحافظة!');
+      } catch (err) {
+        console.error('Clipboard failed:', err);
+      }
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -71,7 +99,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
   const completedCost = items.reduce((sum, item, idx) => completed.has(idx) ? sum + item.estimatedCost : sum, 0);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 relative">
+    <div id="print-area" className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 relative">
       {/* Success Overlay */}
       {showSuccess && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md animate-in zoom-in duration-300">
@@ -98,11 +126,17 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
             {t.optimizedFor.replace('{count}', profile.familyMembers.toString())}
           </p>
         </div>
-        <div className="flex gap-2">
-          <button className="p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+        <div className="flex gap-2 no-print">
+          <button 
+            onClick={handleShare}
+            className="p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          >
             <Share2 className="w-5 h-5" />
           </button>
-          <button className="p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <button 
+            onClick={handlePrint}
+            className="p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          >
             <Printer className="w-5 h-5" />
           </button>
         </div>
@@ -111,7 +145,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
       <div className="grid md:grid-cols-4 gap-6">
         <div className="md:col-span-3 space-y-4">
           {items.length === 0 ? (
-            <div className="bg-slate-50 dark:bg-slate-900/50 p-12 rounded-[2.5rem] text-center border border-dashed border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-900/50 p-12 rounded-[2.5rem] text-center border border-dashed border-slate-200 dark:border-slate-800 no-print">
               <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300 dark:text-slate-600">
                 <ShoppingCart className="w-8 h-8" />
               </div>
@@ -128,7 +162,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
                   completed.has(idx) ? 'border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/5 dark:bg-emerald-500/5' : 'border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-500/50'
                 }`}
               >
-                <button className="flex-shrink-0">
+                <button className="flex-shrink-0 no-print">
                   {completed.has(idx) ? (
                     <CheckCircle2 className="w-6 h-6 text-emerald-500 animate-in zoom-in duration-200" />
                   ) : (
@@ -156,7 +190,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 no-print">
           <div className="bg-slate-900 dark:bg-slate-900 border dark:border-slate-800 p-8 rounded-[32px] text-white space-y-6 sticky top-24 shadow-2xl transition-colors overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700" />
             

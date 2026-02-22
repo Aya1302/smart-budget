@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { UserProfile, BudgetAllocation } from '../types';
 import { getBudgetOptimization } from '../geminiService';
 import { translations, Language } from '../translations';
-import { Sparkles, Save, RotateCcw, Loader2, Printer } from 'lucide-react';
+import { Sparkles, Save, RotateCcw, Loader2, Wallet } from 'lucide-react';
 
 interface BudgetPlannerProps {
   profile: UserProfile;
@@ -17,10 +17,6 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [showSaved, setShowSaved] = useState(false);
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   const fetchBudget = useCallback(async (isManual = false) => {
     if (isManual) setIsRefreshing(true);
@@ -63,8 +59,25 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
   }
 
   return (
-    <div id="print-area" className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex items-center justify-between">
+    <div id="print-area" className="space-y-8 animate-in fade-in duration-700 bg-white dark:bg-transparent p-0 print:p-8">
+      {/* Print Header */}
+      <div className="hidden print:flex items-center justify-between border-b-2 border-emerald-600 pb-6 mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center">
+            <Wallet className="text-white w-7 h-7" />
+          </div>
+          <div className="flex flex-col -space-y-1">
+            <span className="text-3xl font-bold text-slate-800 leading-none font-cairo" style={{ letterSpacing: 'normal' }}>مُدَبِّر</span>
+            <span className="text-xs font-bold text-emerald-600 tracking-[0.2em] uppercase">Modaber</span>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">{t.smartBudget}</p>
+          <p className="text-xs text-slate-400">{new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between no-print">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{t.smartDistribution}</h2>
           <p className="text-slate-500 dark:text-slate-400">
@@ -72,13 +85,6 @@ const BudgetPlanner: React.FC<BudgetPlannerProps> = ({ profile, lang }) => {
           </p>
         </div>
         <div className="flex gap-2 no-print">
-          <button 
-            onClick={handlePrint}
-            className="p-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
-            title={lang === 'en' ? 'Print / Save as PDF' : 'طباعة / حفظ كـ PDF'}
-          >
-            <Printer className="w-5 h-5" />
-          </button>
           <button 
             onClick={handleSave}
             className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-200 dark:shadow-emerald-900/20 hover:scale-105 transition-all"

@@ -23,6 +23,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
   const [isManualSocial, setIsManualSocial] = useState(false);
   const [manualSocialData, setManualSocialData] = useState({ name: '', email: '' });
   const [isResetSent, setIsResetSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -53,11 +54,16 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
     setSuccess(null);
 
     if (view === 'forgot') {
+      if (!formData.email) {
+        setError(lang === 'en' ? 'Please enter your email' : 'يرجى إدخال بريدك الإلكتروني');
+        return;
+      }
       setIsSocialLoading('reset');
       setTimeout(() => {
         setIsResetSent(true);
         setIsSocialLoading(null);
-      }, 1000);
+        setSuccess(lang === 'en' ? 'Verification code sent!' : 'تم إرسال رمز التحقق!');
+      }, 1500);
       return;
     }
 
@@ -102,11 +108,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
 
   const startSocialAuth = (provider: 'Google' | 'Facebook') => {
     setIsSocialLoading(provider);
+    // Simulate a more realistic OAuth popup delay
     setTimeout(() => {
       setIsSocialLoading(null);
       setShowAccountPicker(provider);
       setIsManualSocial(false);
-    }, 600);
+    }, 1200);
   };
 
   const finalizeSocialLogin = (selectedEmail: string, selectedName: string) => {
@@ -275,11 +282,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
           </div>
           
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-white p-2 rounded-xl">
-                <Wallet className="w-8 h-8 text-emerald-600" />
+            <div className="flex items-center gap-4 mb-10">
+              <div className="bg-white p-3 rounded-2xl shadow-xl shadow-emerald-900/40">
+                <Wallet className="w-10 h-10 text-emerald-600" />
               </div>
-              <span className="text-2xl font-black tracking-tight">{t.appName}</span>
+              <div className="flex flex-col space-y-2">
+                <span className="text-4xl font-bold leading-none text-white font-cairo" style={{ letterSpacing: 'normal' }}>مُدَبِّر</span>
+                <span className="text-sm font-bold text-white tracking-[0.3em] uppercase">Modaber</span>
+              </div>
             </div>
             <h1 className="text-4xl font-black leading-tight mb-4 font-cairo">
               {t.heroTitle}
@@ -326,11 +336,56 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
           )}
 
           {view === 'forgot' && isResetSent ? (
-            <div className="bg-emerald-50 dark:bg-emerald-500/10 p-6 rounded-3xl border border-emerald-100 dark:border-emerald-500/20 text-center animate-in zoom-in duration-300">
-              <p className="text-emerald-800 dark:text-emerald-400 font-bold mb-4">{t.resetSent}</p>
+            <div className="bg-emerald-50 dark:bg-emerald-500/10 p-8 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-500/20 text-center animate-in zoom-in duration-300 space-y-6">
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
+                <Mail className="w-8 h-8" />
+              </div>
+              <div>
+                <p className="text-emerald-800 dark:text-emerald-400 font-bold text-lg mb-2">
+                  {lang === 'en' ? 'Check your email' : 'افحص بريدك الإلكتروني'}
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  {lang === 'en' 
+                    ? 'A 6-digit code has been sent. It will expire in 10 minutes.' 
+                    : 'تم إرسال رمز مكون من 6 أرقام. ستنتهي صلاحيته خلال 10 دقائق.'}
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block text-left ml-1">
+                  {lang === 'en' ? 'Verification Code' : 'رمز التحقق'}
+                </label>
+                <input 
+                  type="text"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 px-4 text-center text-2xl font-black tracking-[0.5em] outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                />
+              </div>
+
               <button 
-                onClick={() => { setView('login'); setIsResetSent(false); }}
-                className="text-emerald-600 dark:text-emerald-400 font-black flex items-center justify-center gap-2 mx-auto hover:underline"
+                onClick={() => {
+                  if (verificationCode.length === 6) {
+                    setSuccess(lang === 'en' ? 'Code verified! You can now reset your password.' : 'تم التحقق! يمكنك الآن إعادة تعيين كلمة المرور.');
+                    setTimeout(() => {
+                      setView('login');
+                      setIsResetSent(false);
+                      setVerificationCode('');
+                    }, 2000);
+                  } else {
+                    setError(lang === 'en' ? 'Please enter the 6-digit code' : 'يرجى إدخال الرمز المكون من 6 أرقام');
+                  }
+                }}
+                className="w-full bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl py-4 font-black hover:bg-slate-800 dark:hover:bg-emerald-500 transition-all shadow-lg"
+              >
+                {lang === 'en' ? 'Verify Code' : 'تحقق من الرمز'}
+              </button>
+
+              <button 
+                onClick={() => { setView('login'); setIsResetSent(false); setVerificationCode(''); }}
+                className="text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 mx-auto hover:underline text-sm"
               >
                 <ChevronLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {t.backToLogin}
               </button>

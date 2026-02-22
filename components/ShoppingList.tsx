@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, ShoppingItem } from '../types';
 import { generateShoppingList } from '../geminiService';
 import { translations, Language } from '../translations';
-import { CheckCircle2, Circle, Share2, Printer, AlertCircle, Loader2, Sparkles, PartyPopper } from 'lucide-react';
+import { CheckCircle2, Circle, Share2, AlertCircle, Loader2, Sparkles, PartyPopper, Wallet } from 'lucide-react';
 
 interface ShoppingListProps {
   profile: UserProfile;
@@ -80,10 +80,6 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -99,7 +95,24 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
   const completedCost = items.reduce((sum, item, idx) => completed.has(idx) ? sum + item.estimatedCost : sum, 0);
 
   return (
-    <div id="print-area" className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 relative">
+    <div id="print-area" className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 relative bg-white dark:bg-transparent p-0 print:p-8">
+      {/* Print Header */}
+      <div className="hidden print:flex items-center justify-between border-b-2 border-emerald-600 pb-6 mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center">
+            <Wallet className="text-white w-7 h-7" />
+          </div>
+          <div className="flex flex-col -space-y-1">
+            <span className="text-3xl font-bold text-slate-800 leading-none font-cairo" style={{ letterSpacing: 'normal' }}>مُدَبِّر</span>
+            <span className="text-xs font-bold text-emerald-600 tracking-[0.2em] uppercase">Modaber</span>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">{t.smartShopping}</p>
+          <p className="text-xs text-slate-400">{new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US')}</p>
+        </div>
+      </div>
+
       {/* Success Overlay */}
       {showSuccess && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md animate-in zoom-in duration-300">
@@ -119,7 +132,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{t.shoppingAssistant}</h2>
           <p className="text-slate-500 dark:text-slate-400">
@@ -132,12 +145,6 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
             className="p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           >
             <Share2 className="w-5 h-5" />
-          </button>
-          <button 
-            onClick={handlePrint}
-            className="p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-          >
-            <Printer className="w-5 h-5" />
           </button>
         </div>
       </div>

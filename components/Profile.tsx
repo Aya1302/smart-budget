@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { UserProfile, MaritalStatus, Language, LivingCostLevel, IncomeStability, SavingPreference, RiskTolerance, Debt, AnnualExpense } from '../types';
 import { translations } from '../translations';
-import { User, Wallet, Home, Shield, Edit2, Save, X, CheckCircle2, Coffee, ChevronUp, ChevronDown, Plus, Trash2, CreditCard, Calendar } from 'lucide-react';
+import { User, Wallet, Home, Shield, Edit2, Save, X, CheckCircle2, Coffee, ChevronUp, ChevronDown, Plus, Trash2, CreditCard, Calendar, Download, Loader2 } from 'lucide-react';
+import { generateFullReport } from '../utils/pdfGenerator';
 
 interface ProfileProps {
   profile: UserProfile;
@@ -15,6 +16,18 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState<UserProfile>({ ...profile });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleDownloadReport = async () => {
+    setIsGenerating(true);
+    try {
+      await generateFullReport('full-report-template', `Modaber_Report_${new Date().getTime()}`);
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const [showDebtForm, setShowDebtForm] = useState(false);
   const [newDebt, setNewDebt] = useState<Partial<Debt>>({
@@ -148,12 +161,22 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
         </div>
         <div className="flex gap-2">
           {!isEditing ? (
-            <button 
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg hover:scale-105 transition-all"
-            >
-              <Edit2 className="w-4 h-4" /> {t.editProfile}
-            </button>
+            <>
+              <button 
+                onClick={handleDownloadReport}
+                disabled={isGenerating}
+                className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-50 transition-all disabled:opacity-50"
+              >
+                {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                {lang === 'en' ? 'Download PDF' : 'تحميل PDF'}
+              </button>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg hover:scale-105 transition-all"
+              >
+                <Edit2 className="w-4 h-4" /> {t.editProfile}
+              </button>
+            </>
           ) : (
             <>
               <button 

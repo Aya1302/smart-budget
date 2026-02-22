@@ -27,30 +27,33 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
         @media print {
-            body, html {
-                height: auto !important;
-                overflow: visible !important;
+            @page { margin: 1cm; }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
-            body { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
+            body { 
+                visibility: hidden; 
+                background: white !important;
+            }
+            #print-area, #print-area * { 
+                visibility: visible !important; 
+            }
             #print-area { 
                 position: absolute; 
                 left: 0; 
                 top: 0; 
                 width: 100%; 
+                margin: 0;
+                padding: 0;
                 background: white !important; 
-                color: black !important; 
-                padding: 20px !important;
-                visibility: visible !important;
-                display: block !important;
-            }
-            main, .overflow-hidden, .overflow-y-auto {
-                overflow: visible !important;
-                height: auto !important;
-                display: block !important;
+                color: black !important;
             }
             .no-print { display: none !important; }
-            #print-area span, #print-area p, #print-area h1, #print-area h2, #print-area h3 { color: black !important; }
+            /* Ensure dark mode colors don't affect print */
+            #print-area { color: black !important; }
+            .dark #print-area { color: black !important; background: white !important; }
+            .dark #print-area * { color: black !important; border-color: #eee !important; }
         }
     </style>
 <script type="importmap">

@@ -143,11 +143,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
       }
       
       if (status === 'married' && members === 1) {
-        alert(t.invalidMaritalStatus);
+        alert(lang === 'en' ? 'Marital status "Married" is invalid for 1 family member.' : 'الحالة الاجتماعية "متزوج" غير صحيحة لفرد واحد فقط.');
         return;
       }
       if (status === 'single' && members > 1) {
-        alert(t.invalidMaritalStatus);
+        alert(lang === 'en' ? 'Marital status "Single" is invalid for more than 1 family member.' : 'الحالة الاجتماعية "أعزب" غير صحيحة لأكثر من فرد.');
         return;
       }
     }

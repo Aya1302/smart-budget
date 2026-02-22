@@ -29,6 +29,7 @@ import Investments from './components/Investments';
 import Analytics from './components/Analytics';
 import ExtraPages from './components/ExtraPages';
 import Profile from './components/Profile';
+import HiddenReport from './components/HiddenReport';
 
 const App: React.FC = () => {
   const [account, setAccount] = useState<UserAccount | null>(() => {
@@ -48,19 +49,13 @@ const App: React.FC = () => {
   );
   const [lang, setLang] = useState<Language>(() => {
     const saved = localStorage.getItem('lang');
-    // If we haven't explicitly set a language yet, or to force Arabic for this transition
-    if (!saved) return 'ar';
+    // Force English if not set or if we want to override for this update
+    if (!saved || localStorage.getItem('modaber_v2_lang_reset') !== 'true') {
+      localStorage.setItem('modaber_v2_lang_reset', 'true');
+      return 'en';
+    }
     return saved as Language;
   });
-
-  // Force Arabic on first load if not already set to 'ar' to ensure user sees the change
-  useEffect(() => {
-    const hasForcedAr = localStorage.getItem('modaber_forced_ar');
-    if (!hasForcedAr) {
-      setLang('ar');
-      localStorage.setItem('modaber_forced_ar', 'true');
-    }
-  }, []);
 
   const t = translations[lang];
 
@@ -153,13 +148,16 @@ const App: React.FC = () => {
 
   const SidebarContent = () => (
     <>
-      <div className="p-6 flex items-center justify-between">
+      <div className="p-6 bg-emerald-600 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-900/20">
-            <Wallet className="text-white w-6 h-6" />
+          <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-900/20">
+            <Wallet className="text-emerald-600 w-6 h-6" />
           </div>
           {(isSidebarOpen || isMobileMenuOpen) && (
-            <span className="font-black text-xl text-slate-800 dark:text-white tracking-tight">{t.appName}</span>
+            <div className="flex flex-col space-y-1">
+              <span className="font-bold text-2xl text-white leading-none font-cairo" style={{ letterSpacing: 'normal' }}>مُدَبِّر</span>
+              <span className="text-xs font-bold text-white tracking-[0.2em] uppercase">Modaber</span>
+            </div>
           )}
         </div>
         {isMobileMenuOpen && (
@@ -308,6 +306,10 @@ const App: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 md:p-10 transition-colors duration-300 custom-scrollbar">
           <div className="max-w-7xl mx-auto">
             {renderContent()}
+          </div>
+          {/* Hidden Report Template for PDF Generation */}
+          <div className="fixed -left-[9999px] top-0 opacity-0 pointer-events-none">
+            <HiddenReport profile={profile} lang={lang} />
           </div>
         </div>
       </main>

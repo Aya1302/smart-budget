@@ -8,10 +8,13 @@ import {
   Wallet, 
   Users, 
   ArrowUpRight, 
-  AlertCircle,
-  ShieldCheck,
-  Target
+  AlertCircle, 
+  ShieldCheck, 
+  Target,
+  Download,
+  Loader2
 } from 'lucide-react';
+import { generateFullReport } from '../utils/pdfGenerator';
 import { 
   BarChart, 
   Bar, 
@@ -33,6 +36,18 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
   const t = translations[lang];
+  const [isGenerating, setIsGenerating] = React.useState(false);
+
+  const handleDownloadReport = async () => {
+    setIsGenerating(true);
+    try {
+      await generateFullReport('full-report-template', `Modaber_Report_${new Date().getTime()}`);
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
   
   const totalFixed = useMemo(() => 
     (Object.values(profile.fixedExpenses) as number[]).reduce((a, b) => a + b, 0)
@@ -80,6 +95,14 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
           <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-bold flex items-center gap-2">
             <Users className="w-4 h-4" /> {profile.familyMembers} {t.persons}
           </div>
+          <button 
+            onClick={handleDownloadReport}
+            disabled={isGenerating}
+            className="px-4 py-2 bg-slate-900 dark:bg-emerald-600 text-white rounded-full text-xs font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50 disabled:scale-100"
+          >
+            {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {lang === 'en' ? 'Download PDF' : 'تحميل PDF'}
+          </button>
         </div>
       </div>
 

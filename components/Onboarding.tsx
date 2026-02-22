@@ -243,6 +243,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-slate-500 mb-2">{t.age} ({t.optional})</label>
+                  <input 
+                    type="number" 
+                    min="1"
+                    max="120"
+                    value={formData.age || ''}
+                    onChange={(e) => updateRootField('age', e.target.value ? Number(e.target.value) : undefined)}
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all dark:text-white"
+                  />
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-slate-500 mb-2">{t.maritalStatus} ({t.optional})</label>
                   <select 
                     value={formData.maritalStatus}
@@ -266,7 +277,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                     <option value="Low">{t.low}</option>
                   </select>
                 </div>
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-slate-500 mb-2">{t.incomeStability} ({t.optional})</label>
                   <select 
                     value={formData.incomeStability}

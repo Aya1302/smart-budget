@@ -106,6 +106,12 @@ const HiddenReport: React.FC<HiddenReportProps> = ({ profile, lang }) => {
                 <span className="text-slate-500 font-bold">{t.familyMembers}</span>
                 <span className="font-black text-slate-800">{profile.familyMembers} {t.persons}</span>
               </div>
+              {profile.age && (
+                <div className="flex justify-between items-center py-2 border-b border-slate-200">
+                  <span className="text-slate-500 font-bold">{t.age}</span>
+                  <span className="font-black text-slate-800">{profile.age} {lang === 'en' ? 'Years' : 'سنة'}</span>
+                </div>
+              )}
               <div className="flex justify-between items-center py-2 border-b border-slate-200">
                 <span className="text-slate-500 font-bold">{t.maritalStatus}</span>
                 <span className="font-black text-slate-800 capitalize">{t[profile.maritalStatus as keyof typeof t] || profile.maritalStatus}</span>

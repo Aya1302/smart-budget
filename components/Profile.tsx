@@ -218,6 +218,21 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.age} ({t.optional})</label>
+              {isEditing ? (
+                <input 
+                  type="number" 
+                  min="1"
+                  max="120"
+                  value={editedProfile.age || ''}
+                  onChange={(e) => updateRootField('age', e.target.value ? Number(e.target.value) : undefined)}
+                  className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                />
+              ) : (
+                <p className="text-xl font-black text-slate-800 dark:text-slate-100">{profile.age || t.not_specified}</p>
+              )}
+            </div>
+            <div>
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.monthlySalary} <span className="text-rose-500">*</span></label>
               {isEditing ? (
                 <input 
@@ -277,7 +292,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                 <p className="text-xl font-black text-slate-800 dark:text-slate-100">{t[profile.livingCostLevel.toLowerCase() as keyof typeof t] || profile.livingCostLevel}</p>
               )}
             </div>
-            <div className="col-span-2">
+            <div>
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t.incomeStability} ({t.optional})</label>
               {isEditing ? (
                 <select 

@@ -43,7 +43,6 @@ const HiddenReport: React.FC<HiddenReportProps> = ({ profile, lang }) => {
             </div>
             <div>
               <h1 className="text-6xl font-bold text-slate-800 font-cairo" style={{ letterSpacing: 'normal' }}>مُدَبِّر</h1>
-              <p className="text-sm font-black text-emerald-600 tracking-[0.4em] uppercase">AI Financial Intelligence Report</p>
             </div>
           </div>
           <div className="text-right rtl:text-left">

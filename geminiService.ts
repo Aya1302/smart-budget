@@ -121,12 +121,14 @@ export async function getPricePredictions(): Promise<PricePrediction[]> {
   }
 }
 
-export async function generateShoppingList(profile: UserProfile, budgetLimit: number): Promise<ShoppingItem[]> {
+export async function generateShoppingList(profile: UserProfile, budgetLimit: number, customInstructions?: string): Promise<ShoppingItem[]> {
   const prompt = `
     Generate a smart, optimized monthly grocery shopping list for a family of ${profile.familyMembers}.
     The total budget for this list must not exceed ${budgetLimit} EGP.
     Living Cost Level is ${profile.livingCostLevel}.
     Focus on healthy essentials and value-for-money items.
+    
+    ${customInstructions ? `IMPORTANT: The user has provided these specific instructions/filters: "${customInstructions}". Please strictly follow them (e.g., if they say "no rice", do not include rice; if they say "more meat", prioritize meat within budget).` : ''}
     
     Return a list of objects with:
     - name (string)

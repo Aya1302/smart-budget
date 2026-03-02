@@ -42,7 +42,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
       savingPriority: 'not_specified',
       riskTolerance: 'not_specified',
       emergencyFundPercentage: 10,
-      monthlyPriorities: ['cat_food', 'cat_transport', 'cat_emergency', 'cat_savings', 'cat_invest', 'cat_personal']
+      monthlyPriorities: ['food', 'saving', 'emergency', 'optional']
     }
   });
 
@@ -569,73 +569,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
                           >
                             <ChevronDown className="w-4 h-4" />
                           </button>
-                          <button 
-                            onClick={() => {
-                              const newPriorities = formData.preferences.monthlyPriorities.filter(item => item !== p);
-                              updatePreference('monthlyPriorities', newPriorities);
-                            }}
-                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg text-rose-500"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
                         </div>
                       </div>
                     ))}
-                  </div>
-                  
-                  {/* Add Priority Section */}
-                  <div className="space-y-3">
-                    {showCustomPriorityInput ? (
-                      <div className="flex gap-2 p-3 bg-white dark:bg-slate-900 rounded-xl border border-emerald-100 dark:border-emerald-500/20 animate-in slide-in-from-top-2">
-                        <input 
-                          type="text" 
-                          autoFocus
-                          placeholder={lang === 'en' ? 'Priority name...' : 'اسم الأولوية...'}
-                          value={customPriority}
-                          onChange={(e) => setCustomPriority(e.target.value)}
-                          className="flex-1 bg-transparent outline-none text-sm dark:text-white"
-                        />
-                        <button 
-                          onClick={() => {
-                            if (customPriority.trim()) {
-                              updatePreference('monthlyPriorities', [...formData.preferences.monthlyPriorities, customPriority.trim()]);
-                              setCustomPriority('');
-                              setShowCustomPriorityInput(false);
-                            }
-                          }}
-                          className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold"
-                        >
-                          {t.addDebt.split(' ')[0]}
-                        </button>
-                        <button onClick={() => setShowCustomPriorityInput(false)} className="p-1 text-slate-400"><X className="w-4 h-4" /></button>
-                      </div>
-                    ) : (
-                      <button 
-                        onClick={() => setShowCustomPriorityInput(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-bold hover:bg-slate-200 transition-all border border-dashed border-slate-300 dark:border-slate-700"
-                      >
-                        <Plus className="w-4 h-4" /> {lang === 'en' ? 'Add Custom Priority' : 'إضافة أولوية مخصصة'}
-                      </button>
-                    )}
-
-                    {['cat_food', 'cat_transport', 'cat_emergency', 'cat_savings', 'cat_invest', 'cat_personal'].filter(p => !formData.preferences.monthlyPriorities.includes(p)).length > 0 && (
-                      <div className="flex flex-wrap gap-2 p-3 bg-slate-50/50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-                        {['cat_food', 'cat_transport', 'cat_emergency', 'cat_savings', 'cat_invest', 'cat_personal']
-                          .filter(p => !formData.preferences.monthlyPriorities.includes(p))
-                          .map(p => (
-                            <button
-                              key={p}
-                              onClick={() => {
-                                updatePreference('monthlyPriorities', [...formData.preferences.monthlyPriorities, p]);
-                              }}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600 transition-all"
-                            >
-                              <Plus className="w-3 h-3" /> {t[p as keyof typeof t] || p}
-                            </button>
-                          ))
-                        }
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

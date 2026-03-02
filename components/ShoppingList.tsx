@@ -17,16 +17,33 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [customInstructions, setCustomInstructions] = useState('');
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  const fetchList = async (instructions?: string) => {
+    if (instructions !== undefined) setIsRegenerating(true);
+    else setLoading(true);
+
+    try {
+      const suggestBudget = profile.familyMembers * 150;
+      const data = await generateShoppingList(profile, suggestBudget, instructions);
+      setItems(data);
+      setCompleted(new Set());
+    } catch (error) {
+      console.error("Failed to fetch shopping list:", error);
+    } finally {
+      setLoading(false);
+      setIsRegenerating(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchList = async () => {
-      const suggestBudget = profile.familyMembers * 150;
-      const data = await generateShoppingList(profile, suggestBudget);
-      setItems(data);
-      setLoading(false);
-    };
     fetchList();
   }, [profile]);
+
+  const handleRegenerate = () => {
+    fetchList(customInstructions);
+  };
 
   const toggleComplete = (idx: number) => {
     if (isCheckingOut) return;
@@ -146,6 +163,33 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
           >
             <Share2 className="w-5 h-5" />
           </button>
+        </div>
+      </div>
+
+      {/* Custom Instructions Section */}
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm no-print">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{t.customInstructions}</label>
+            <input 
+              type="text"
+              value={customInstructions}
+              onChange={(e) => setCustomInstructions(e.target.value)}
+              placeholder={t.customInstructionsPlaceholder}
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all dark:text-white text-sm"
+              onKeyDown={(e) => e.key === 'Enter' && handleRegenerate()}
+            />
+          </div>
+          <div className="flex items-end">
+            <button 
+              onClick={handleRegenerate}
+              disabled={isRegenerating}
+              className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-900/20 hover:scale-105 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isRegenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {t.regenerateList}
+            </button>
+          </div>
         </div>
       </div>
 

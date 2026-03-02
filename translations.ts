@@ -108,6 +108,10 @@ export const translations = {
     completed: "Completed",
     totalEst: "Total Est.",
     highPriority: "High Priority",
+    customInstructions: "Custom Instructions / Filters",
+    customInstructionsPlaceholder: "e.g., no rice, more meat, keto diet...",
+    regenerateList: "Regenerate List",
+    regeneratePredictions: "Regenerate Predictions",
 
     // Investments
     investmentEngine: "Safe Investment Engine",
@@ -147,12 +151,14 @@ export const translations = {
     internet: "Internet",
     mobile: "Mobile",
     required: "Required",
-    optional: "Optional",
+    optional: "Optional Expenses",
 
     // Optional fields
     streaming: "TV / Streaming",
     education: "Private Lessons / Education",
     medical: "Medical / Insurance",
+    saving: "Savings",
+    emergency: "Emergency Fund",
 
     // Priority Categories
     cat_food: "Food & Groceries",
@@ -307,6 +313,10 @@ export const translations = {
     completed: "المكتملة",
     totalEst: "الإجمالي المقدر",
     highPriority: "أولوية عالية",
+    customInstructions: "تعليمات مخصصة / فلاتر",
+    customInstructionsPlaceholder: "مثلاً: بدون أرز، لحم أكثر، نظام كيتو...",
+    regenerateList: "إعادة توليد القائمة",
+    regeneratePredictions: "إعادة توليد التوقعات",
 
     // Investments
     investmentEngine: "محرك الاستثمار الآمن",
@@ -346,12 +356,14 @@ export const translations = {
     internet: "الإنترنت",
     mobile: "الموبايل",
     required: "مطلوب",
-    optional: "اختياري",
+    optional: "مصاريف اختيارية",
 
     // Optional fields
     streaming: "تلفاز / اشتراكات",
     education: "دروس خصوصية / تعليم",
     medical: "طبابة / تأمين",
+    saving: "الادخار",
+    emergency: "صندوق الطوارئ",
 
     // Priority Categories
     cat_food: "الطعام والمواد التموينية",

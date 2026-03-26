@@ -12,7 +12,13 @@ import {
   ShieldCheck, 
   Target,
   Download,
-  Loader2
+  Loader2,
+  Coffee,
+  Utensils,
+  Stethoscope,
+  Plane,
+  PlusCircle,
+  ShoppingBag
 } from 'lucide-react';
 import { generateFullReport } from '../utils/pdfGenerator';
 import { 
@@ -32,11 +38,44 @@ interface DashboardProps {
   profile: UserProfile;
   lang: Language;
   theme: 'light' | 'dark';
+  onUpdate: (profile: UserProfile) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
+const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme, onUpdate }) => {
   const t = translations[lang];
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [expenseInputs, setExpenseInputs] = React.useState({
+    foodDrink: '',
+    cafe: '',
+    medical: '',
+    travel: ''
+  });
+
+  const handleAddExpense = (category: keyof NonNullable<UserProfile['dailyExpenses']>) => {
+    const amountStr = expenseInputs[category as keyof typeof expenseInputs];
+    const amount = parseFloat(amountStr);
+    if (isNaN(amount) || amount <= 0) return;
+
+    const currentExpenses = profile.dailyExpenses || {
+      foodDrink: 0,
+      cafe: 0,
+      medical: 0,
+      travel: 0
+    };
+
+    const prevValue = (currentExpenses[category] as number) || 0;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      dailyExpenses: {
+        ...currentExpenses,
+        [category]: prevValue + amount
+      }
+    };
+
+    onUpdate(updatedProfile);
+    setExpenseInputs(prev => ({ ...prev, [category]: '' }));
+  };
 
   const handleDownloadReport = async () => {
     setIsGenerating(true);
@@ -53,8 +92,12 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
     (Object.values(profile.fixedExpenses) as number[]).reduce((a, b) => a + b, 0)
   , [profile]);
 
+  const totalDaily = useMemo(() => 
+    profile.dailyExpenses ? (Object.values(profile.dailyExpenses) as number[]).reduce((a, b) => a + b, 0) : 0
+  , [profile]);
+
   const totalIncome = profile.monthlySalary;
-  const availableIncome = totalIncome - totalFixed;
+  const availableIncome = totalIncome - totalFixed - totalDaily;
 
   const mockChartData = [
     { name: 'Jan', expenses: 3200, savings: 800 },
@@ -65,14 +108,15 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
 
   const pieData = [
     { name: t.fixedCosts, value: totalFixed, color: '#10b981' },
+    { name: t.dailyExpenses, value: totalDaily, color: '#f59e0b' },
     { name: t.availableCash, value: availableIncome, color: '#94a3b8' },
   ];
 
   const stats = [
     { label: t.totalIncome, value: `${totalIncome} ${t.currency}`, icon: Wallet, color: 'emerald' },
     { label: t.fixedCosts, value: `${totalFixed} ${t.currency}`, icon: TrendingDown, color: 'rose' },
+    { label: t.dailyExpenses, value: `${totalDaily} ${t.currency}`, icon: ShoppingBag, color: 'amber' },
     { label: t.availableCash, value: `${availableIncome} ${t.currency}`, icon: TrendingUp, color: 'blue' },
-    { label: t.financialScore, value: `84/100`, icon: Target, color: 'amber' },
   ];
 
   const monthName = new Date().toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US', { month: 'long' });
@@ -121,6 +165,58 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
             <h4 className="text-3xl font-black text-slate-800 dark:text-slate-100">{stat.value}</h4>
           </div>
         ))}
+      </div>
+
+      {/* Daily Expenses Section */}
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 font-cairo flex items-center gap-2">
+            <PlusCircle className="w-5 h-5 text-emerald-500" />
+            {t.dailyExpenses}
+          </h3>
+          <div className="text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-700">
+            {t.totalIncome}: {totalDaily} {t.currency}
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { id: 'foodDrink', label: t.foodDrink, icon: Utensils, color: 'orange' },
+            { id: 'cafe', label: t.cafe, icon: Coffee, color: 'amber' },
+            { id: 'medical', label: t.medicalExpense, icon: Stethoscope, color: 'rose' },
+            { id: 'travel', label: t.travel, icon: Plane, color: 'blue' }
+          ].map((cat) => (
+            <div key={cat.id} className="space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <div className={`p-2 rounded-lg bg-${cat.color}-50 dark:bg-${cat.color}-500/10 text-${cat.color}-600 dark:text-${cat.color}-400`}>
+                  <cat.icon className="w-4 h-4" />
+                </div>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-300 font-cairo">{cat.label}</span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  placeholder={t.amount}
+                  value={expenseInputs[cat.id as keyof typeof expenseInputs]}
+                  onChange={(e) => setExpenseInputs(prev => ({ ...prev, [cat.id]: e.target.value }))}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-emerald-500 transition-colors text-slate-800 dark:text-white"
+                />
+                <button
+                  onClick={() => handleAddExpense(cat.id as any)}
+                  className="p-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-900/20"
+                >
+                  <PlusCircle className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex justify-between items-center px-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.actual}</span>
+                <span className="text-xs font-black text-slate-700 dark:text-slate-200">
+                  {profile.dailyExpenses?.[cat.id as keyof NonNullable<UserProfile['dailyExpenses']>] || 0} {t.currency}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -182,6 +278,12 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme }) => {
                 <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200" /> {t.fixedCosts}
               </span>
               <span className="font-black text-slate-800 dark:text-slate-100">{totalFixed} {t.currency}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+              <span className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-bold">
+                <div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm shadow-amber-200" /> {t.dailyExpenses}
+              </span>
+              <span className="font-black text-slate-800 dark:text-slate-100">{totalDaily} {t.currency}</span>
             </div>
             <div className="flex justify-between items-center text-sm p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
               <span className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-bold">

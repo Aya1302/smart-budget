@@ -101,7 +101,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
         <div className="w-12 h-12 border-4 border-slate-900 dark:border-emerald-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 dark:text-slate-400 font-medium font-Cairo">
+        <p className="text-slate-500 dark:text-slate-400 font-medium font-cairo">
           {lang === 'en' ? 'Curating your smart grocery list...' : 'جاري تحضير قائمة تسوقك الذكية...'}
         </p>
       </div>
@@ -137,7 +137,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
             <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 animate-bounce">
               <PartyPopper className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 font-Cairo">
+            <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 font-cairo">
               {lang === 'en' ? 'Logged Successfully!' : 'تم التسجيل بنجاح!'}
             </h3>
             <p className="text-slate-500 dark:text-slate-400 font-medium">
@@ -151,7 +151,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{t.shoppingAssistant}</h2>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{t.shoppingAssistant}</h2>
           <p className="text-slate-500 dark:text-slate-400">
             {t.optimizedFor.replace('{count}', profile.familyMembers.toString())}
           </p>
@@ -245,7 +245,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
           <div className="bg-slate-900 dark:bg-slate-900 border dark:border-slate-800 p-8 rounded-[32px] text-white space-y-6 sticky top-24 shadow-2xl transition-colors overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700" />
             
-            <h3 className="font-bold text-lg font-Cairo relative z-10">{t.listSummary}</h3>
+            <h3 className="font-bold text-lg font-cairo relative z-10">{t.listSummary}</h3>
             
             <div className="space-y-4 relative z-10">
               <div className="flex justify-between text-sm text-slate-400">
@@ -284,7 +284,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
           <div className="bg-amber-50 dark:bg-amber-500/10 p-6 rounded-3xl border border-amber-100 dark:border-amber-500/20">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-bold mb-2">
               <AlertCircle className="w-5 h-5" />
-              <h4 className="text-sm uppercase tracking-wider font-Cairo">{t.aiGuard}</h4>
+              <h4 className="text-sm uppercase tracking-wider font-cairo">{t.aiGuard}</h4>
             </div>
             <p className="text-xs text-amber-800 dark:text-amber-500 leading-relaxed font-medium">
               {lang === 'en' 

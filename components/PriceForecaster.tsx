@@ -28,7 +28,7 @@ const PriceForecaster: React.FC<PriceForecasterProps> = ({ profile, lang }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
         <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 dark:text-slate-400 font-Cairo">{t.scanningMarkets}</p>
+        <p className="text-slate-500 dark:text-slate-400 font-cairo">{t.scanningMarkets}</p>
       </div>
     );
   }
@@ -37,7 +37,7 @@ const PriceForecaster: React.FC<PriceForecasterProps> = ({ profile, lang }) => {
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{t.priceForecasting}</h2>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{t.priceForecasting}</h2>
           <p className="text-slate-500 dark:text-slate-400">{t.nextMonthMarket}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-4 py-2 rounded-xl shadow-sm text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">

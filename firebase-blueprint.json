@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User's financial profile and preferences",
+      "type": "object",
+      "properties": {
+        "monthlySalary": { "type": "number" },
+        "familyMembers": { "type": "number" },
+        "maritalStatus": { "type": "string", "enum": ["single", "married", "not_specified"] },
+        "livingCostLevel": { "type": "string", "enum": ["High", "Medium", "Low"] },
+        "incomeStability": { "type": "string", "enum": ["Full-time", "Freelance", "Seasonal", "Mixed"] },
+        "fixedExpenses": { "type": "object" },
+        "debts": { "type": "array" },
+        "annualExpenses": { "type": "array" },
+        "optionalExpenses": { "type": "object" },
+        "preferences": { "type": "object" }
+      },
+      "required": ["monthlySalary", "familyMembers", "maritalStatus"]
+    },
+    "DailyExpense": {
+      "title": "Daily Expense",
+      "description": "A single daily expense entry",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "category": { "type": "string", "enum": ["food_drink", "cafe", "medicine", "travel", "other"] },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "description": { "type": "string" }
+      },
+      "required": ["userId", "category", "amount", "date"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles"
+    },
+    "/expenses": {
+      "schema": "DailyExpense",
+      "description": "Daily expenses for all users"
+    }
+  }
+}

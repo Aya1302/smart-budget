@@ -50,7 +50,7 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
     return (
       <div className="space-y-8 animate-in fade-in duration-700">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-black text-slate-800 dark:text-slate-100 font-Cairo flex items-center gap-3">
+          <h2 className="text-3xl font-black text-slate-800 dark:text-slate-100 font-cairo flex items-center gap-3">
             <Lock className="w-8 h-8 text-emerald-600" /> {t.investmentVault}
           </h2>
           <button 
@@ -63,7 +63,7 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
 
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
-            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{lang === 'en' ? 'Investment Masterclass' : 'دروس الاستثمار'}</h3>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{lang === 'en' ? 'Investment Masterclass' : 'دروس الاستثمار'}</h3>
             <div className="space-y-4">
               {[
                 { title: lang === 'en' ? 'Compound Interest' : 'الفائدة المركبة', desc: lang === 'en' ? 'How small savings grow exponentially over time.' : 'كيف تنمو المدخرات الصغيرة بشكل كبير بمرور الوقت.' },
@@ -80,7 +80,7 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
 
           <div className="bg-emerald-900 text-white p-8 rounded-[2.5rem] shadow-xl space-y-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full -mr-16 -mt-16 blur-3xl" />
-            <h3 className="text-xl font-bold font-Cairo relative z-10">{lang === 'en' ? 'Your Stability Score' : 'تقييم استقرارك'}</h3>
+            <h3 className="text-xl font-bold font-cairo relative z-10">{lang === 'en' ? 'Your Stability Score' : 'تقييم استقرارك'}</h3>
             <div className="space-y-4 relative z-10">
               <div className="flex justify-between items-end">
                 <span className="text-sm text-emerald-200">{lang === 'en' ? 'Monthly Surplus' : 'الفائض الشهري'}</span>
@@ -110,7 +110,7 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
             <ShieldCheck className="w-10 h-10" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{t.investmentEngine}</h2>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{t.investmentEngine}</h2>
             <p className="text-slate-500 dark:text-slate-400">{t.curatingLowRisk}</p>
           </div>
         </div>
@@ -131,7 +131,7 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
             <Lock className="w-6 h-6" />
           </div>
           <div className="space-y-1">
-            <h4 className="font-black text-amber-900 dark:text-amber-400 uppercase text-xs tracking-widest font-Cairo">{t.stabilityCaution}</h4>
+            <h4 className="font-black text-amber-900 dark:text-amber-400 uppercase text-xs tracking-widest font-cairo">{t.stabilityCaution}</h4>
             <p className="text-sm text-amber-800 dark:text-amber-500 leading-relaxed font-medium">
               {t.emergencyReserve}
             </p>
@@ -150,7 +150,7 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
                 </span>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 font-Cairo">{opt.title}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 font-cairo">{opt.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{opt.description}</p>
               </div>
               <div className="bg-emerald-50/50 dark:bg-emerald-500/5 p-4 rounded-2xl border border-emerald-100/50 dark:border-emerald-500/20">
@@ -177,7 +177,7 @@ const Investments: React.FC<InvestmentsProps> = ({ profile, lang }) => {
               <Info className="w-12 h-12 text-emerald-400" />
             </div>
             <div className="flex-1 space-y-3">
-              <h3 className="text-2xl font-black font-Cairo">{t.investmentMasterclass}</h3>
+              <h3 className="text-2xl font-black font-cairo">{t.investmentMasterclass}</h3>
               <p className="text-slate-400 dark:text-emerald-100/60 font-medium">{t.learnGrowing}</p>
             </div>
             <button 

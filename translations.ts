@@ -207,6 +207,13 @@ export const translations = {
     hasAccount: "Already have an account?",
     createOne: "Create one",
     signInHere: "Sign in here",
+    dailyExpenses: "Daily Expenses",
+    foodDrink: "Food & Drink",
+    cafe: "Cafe",
+    medicalExpense: "Medical",
+    travel: "Travel",
+    addExpense: "Add Expense",
+    amount: "Amount",
     currency: "EGP"
   },
   ar: {
@@ -412,6 +419,13 @@ export const translations = {
     hasAccount: "لديك حساب بالفعل؟",
     createOne: "أنشئ حساباً",
     signInHere: "سجل الدخول هنا",
+    dailyExpenses: "المصاريف اليومية",
+    foodDrink: "اكل وشرب",
+    cafe: "كافيه",
+    medicalExpense: "علاج",
+    travel: "سفر",
+    addExpense: "إضافة مصروف",
+    amount: "المبلغ",
     currency: "ج.م"
   }
 };

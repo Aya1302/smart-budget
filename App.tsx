@@ -130,7 +130,7 @@ const App: React.FC = () => {
   if (!profile) return <Onboarding onComplete={handleOnboardingComplete} lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} />;
 
   const renderContent = () => {
-    const props = { profile, lang };
+    const props = { profile, lang, onUpdate: handleUpdateProfile };
     switch (activeTab) {
       case 'dashboard': return <Dashboard {...props} theme={theme} />;
       case 'budget': return <BudgetPlanner {...props} />;

@@ -52,6 +52,12 @@ export interface UserProfile {
     education: number;
     medical: number;
   };
+  dailyExpenses?: {
+    foodDrink: number;
+    cafe: number;
+    medical: number;
+    travel: number;
+  };
   preferences: {
     savingPriority: SavingPreference;
     riskTolerance: RiskTolerance;

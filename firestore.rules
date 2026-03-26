@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId
+    // Fields:
+    //   - monthlySalary: number (required)
+    //   - familyMembers: number (required)
+    //   - maritalStatus: string (required)
+    //   - livingCostLevel: string
+    //   - incomeStability: string
+    //   - fixedExpenses: map
+    //   - debts: list
+    //   - annualExpenses: list
+    //   - optionalExpenses: map
+    //   - preferences: map
+    //
+    // Collection: expenses
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required)
+    //   - category: string (required) - food_drink, cafe, medicine, travel, other
+    //   - amount: number (required)
+    //   - date: string (required, ISO 8601)
+    //   - description: string (optional)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['monthlySalary', 'familyMembers', 'maritalStatus']) &&
+             data.monthlySalary is number &&
+             data.familyMembers is number &&
+             data.maritalStatus in ['single', 'married', 'not_specified'];
+    }
+
+    function isValidExpense(data) {
+      return data.keys().hasAll(['userId', 'category', 'amount', 'date']) &&
+             data.userId == request.auth.uid &&
+             data.category in ['food_drink', 'cafe', 'medicine', 'travel', 'other'] &&
+             data.amount is number && data.amount > 0 &&
+             data.date is string;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && isValidExpense(request.resource.data);
+      allow update: if isAuthenticated() && isDocOwner() && isValidExpense(request.resource.data);
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
+    
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

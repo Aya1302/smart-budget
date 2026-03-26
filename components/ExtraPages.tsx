@@ -28,7 +28,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
           <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
             <BrainCircuit className="w-10 h-10" />
           </div>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 font-Cairo">
+          <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 font-cairo">
             {lang === 'en' ? 'How Modaber Works' : 'كيف يعمل مُدَبَّر'}
           </h1>
         </div>
@@ -37,7 +37,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
           {items.map((item, i) => (
             <div key={i} className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-4 hover:shadow-xl transition-all">
               <span className="text-5xl font-black text-slate-100 dark:text-slate-800 block">{item.icon}</span>
-              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{item.title}</h3>
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{item.title}</h3>
               <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">{item.desc}</p>
             </div>
           ))}
@@ -65,7 +65,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
           <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
             <HelpCircle className="w-10 h-10" />
           </div>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 font-Cairo">
+          <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 font-cairo">
             {lang === 'en' ? 'Help & Support' : 'المساعدة والدعم'}
           </h1>
         </div>
@@ -73,7 +73,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
         <div className="grid gap-6">
           {faqs.map((faq, i) => (
             <div key={i} className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 font-Cairo flex items-center gap-3">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 font-cairo flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
                 {faq.q}
               </h3>
@@ -83,7 +83,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
         </div>
 
         <div className="bg-slate-900 dark:bg-emerald-900/20 p-10 rounded-[3rem] text-white text-center space-y-6">
-          <h3 className="text-2xl font-black font-Cairo">{lang === 'en' ? 'Still need help?' : 'هل ما زلت بحاجة للمساعدة؟'}</h3>
+          <h3 className="text-2xl font-black font-cairo">{lang === 'en' ? 'Still need help?' : 'هل ما زلت بحاجة للمساعدة؟'}</h3>
           <p className="text-slate-400">
             {lang === 'en' ? 'Contact our support team anytime at:' : 'تواصل مع فريق الدعم في أي وقت على:'}
             <br />
@@ -104,7 +104,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
     <div className="max-w-3xl mx-auto space-y-8 pb-20">
       <div className="bg-emerald-600 p-12 rounded-[48px] text-white">
         <ShieldCheck className="w-16 h-16 mb-6 opacity-80" />
-        <h1 className="text-4xl font-black mb-4 font-Cairo">
+        <h1 className="text-4xl font-black mb-4 font-cairo">
           {lang === 'en' ? 'Privacy & Data Security' : 'الخصوصية وأمن البيانات'}
         </h1>
         <p className="text-emerald-100 leading-relaxed max-w-lg">
@@ -118,7 +118,7 @@ const ExtraPages: React.FC<ExtraPagesProps> = ({ type, lang }) => {
             <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
               <ChevronRight className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} />
             </div>
-            <p className="font-bold text-slate-700 dark:text-slate-300 font-Cairo">
+            <p className="font-bold text-slate-700 dark:text-slate-300 font-cairo">
               {lang === 'en' ? 'Bank-grade security protocol active.' : 'بروتوكول أمان بمستوى بنكي نشط.'}
             </p>
           </div>

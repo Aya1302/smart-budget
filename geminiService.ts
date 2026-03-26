@@ -2,7 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { UserProfile, BudgetAllocation, PricePrediction, ShoppingItem } from "./types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.API_KEY });
 
 export async function getBudgetOptimization(profile: UserProfile): Promise<BudgetAllocation[]> {
   const totalIncome = profile.monthlySalary;

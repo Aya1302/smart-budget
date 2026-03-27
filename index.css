@@ -1,22 +1,32 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --font-sans: "Inter", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-cairo: "Cairo", sans-serif;
 }
 
 @layer base {
-  * {
-    @apply border-slate-200 dark:border-slate-800;
-  }
   body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
+    font-family: 'Inter', 'Cairo', sans-serif;
   }
 }
 
-.glass {
-  @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/20 dark:border-slate-800/20;
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
 }
 
-.card-gradient {
-  @apply bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
 }

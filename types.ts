@@ -28,6 +28,14 @@ export interface UserAccount {
   avatar?: string;
 }
 
+export interface DailyExpense {
+  id: string;
+  amount: number;
+  category: 'food' | 'cafe' | 'medical' | 'travel' | 'other';
+  description?: string;
+  date: string;
+}
+
 export interface UserProfile {
   account: UserAccount;
   monthlySalary: number;
@@ -47,16 +55,11 @@ export interface UserProfile {
   };
   debts: Debt[];
   annualExpenses: AnnualExpense[];
+  dailyExpenses?: DailyExpense[];
   optionalExpenses: {
     streaming: number;
     education: number;
     medical: number;
-  };
-  dailyExpenses?: {
-    foodDrink: number;
-    cafe: number;
-    medical: number;
-    travel: number;
   };
   preferences: {
     savingPriority: SavingPreference;

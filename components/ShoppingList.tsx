@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, ShoppingItem } from '../types';
 import { generateShoppingList } from '../geminiService';
 import { translations, Language } from '../translations';
-import { CheckCircle2, Circle, Share2, AlertCircle, Loader2, Sparkles, PartyPopper, Wallet } from 'lucide-react';
+import { CheckCircle2, Circle, Share2, AlertCircle, Loader2, Sparkles, PartyPopper, Wallet, ShoppingBag } from 'lucide-react';
 
 interface ShoppingListProps {
   profile: UserProfile;
@@ -101,7 +101,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
         <div className="w-12 h-12 border-4 border-slate-900 dark:border-emerald-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 dark:text-slate-400 font-medium font-cairo">
+        <p className="text-slate-500 dark:text-slate-400 font-medium font-Cairo">
           {lang === 'en' ? 'Curating your smart grocery list...' : 'جاري تحضير قائمة تسوقك الذكية...'}
         </p>
       </div>
@@ -137,7 +137,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
             <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 animate-bounce">
               <PartyPopper className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 font-cairo">
+            <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 font-Cairo">
               {lang === 'en' ? 'Logged Successfully!' : 'تم التسجيل بنجاح!'}
             </h3>
             <p className="text-slate-500 dark:text-slate-400 font-medium">
@@ -151,7 +151,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">{t.shoppingAssistant}</h2>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-Cairo">{t.shoppingAssistant}</h2>
           <p className="text-slate-500 dark:text-slate-400">
             {t.optimizedFor.replace('{count}', profile.familyMembers.toString())}
           </p>
@@ -198,7 +198,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
           {items.length === 0 ? (
             <div className="bg-slate-50 dark:bg-slate-900/50 p-12 rounded-[2.5rem] text-center border border-dashed border-slate-200 dark:border-slate-800 no-print">
               <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300 dark:text-slate-600">
-                <ShoppingCart className="w-8 h-8" />
+                <ShoppingBag className="w-8 h-8" />
               </div>
               <p className="text-slate-400 dark:text-slate-500 font-medium">
                 {lang === 'en' ? 'All items logged or list empty.' : 'تم تسجيل جميع الأصناف أو القائمة فارغة.'}
@@ -245,7 +245,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
           <div className="bg-slate-900 dark:bg-slate-900 border dark:border-slate-800 p-8 rounded-[32px] text-white space-y-6 sticky top-24 shadow-2xl transition-colors overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700" />
             
-            <h3 className="font-bold text-lg font-cairo relative z-10">{t.listSummary}</h3>
+            <h3 className="font-bold text-lg font-Cairo relative z-10">{t.listSummary}</h3>
             
             <div className="space-y-4 relative z-10">
               <div className="flex justify-between text-sm text-slate-400">
@@ -284,7 +284,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
           <div className="bg-amber-50 dark:bg-amber-500/10 p-6 rounded-3xl border border-amber-100 dark:border-amber-500/20">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-bold mb-2">
               <AlertCircle className="w-5 h-5" />
-              <h4 className="text-sm uppercase tracking-wider font-cairo">{t.aiGuard}</h4>
+              <h4 className="text-sm uppercase tracking-wider font-Cairo">{t.aiGuard}</h4>
             </div>
             <p className="text-xs text-amber-800 dark:text-amber-500 leading-relaxed font-medium">
               {lang === 'en' 
@@ -298,9 +298,5 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ profile, lang }) => {
   );
 };
 
-// Simple icon for placeholder
-const ShoppingCart = ({ className }: { className?: string }) => (
-  <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-);
-
+// No custom icon needed as we use lucide-react
 export default ShoppingList;

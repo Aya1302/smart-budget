@@ -15,6 +15,7 @@ interface OnboardingProps {
 const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, theme, setTheme }) => {
   const t = translations[lang];
   const [step, setStep] = useState(1);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formData, setFormData] = useState<Omit<UserProfile, 'account'>>({
     monthlySalary: 6000,
     age: undefined,
@@ -61,11 +62,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
     totalAmount: 0,
     priority: 'Medium'
   });
-  const [error, setError] = useState<string | null>(null);
 
   const updateRootField = (field: keyof Omit<UserProfile, 'account'>, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setError(null);
   };
 
   const updateFixedExpense = (field: keyof typeof formData.fixedExpenses, value: number) => {
@@ -135,38 +134,35 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
   };
 
   const nextStep = () => {
-    setError(null);
+    setErrorMsg(null);
     if (step === 1) {
       const members = Number(formData.familyMembers);
       const status = formData.maritalStatus;
 
       if (!formData.monthlySalary || !members) {
-        setError(lang === 'en' ? 'Salary and Family Members are required' : 'الراتب وعدد أفراد الأسرة حقول مطلوبة');
+        setErrorMsg(lang === 'en' ? 'Salary and Family Members are required' : 'الراتب وعدد أفراد الأسرة حقول مطلوبة');
         return;
       }
       
       if (status === 'married' && members === 1) {
-        setError(t.invalidMaritalStatus);
+        setErrorMsg(lang === 'en' ? 'Marital status "Married" is invalid for 1 family member.' : 'الحالة الاجتماعية "متزوج" غير صحيحة لفرد واحد فقط.');
         return;
       }
       if (status === 'single' && members > 1) {
-        setError(t.invalidMaritalStatus);
+        setErrorMsg(lang === 'en' ? 'Marital status "Single" is invalid for more than 1 family member.' : 'الحالة الاجتماعية "أعزب" غير صحيحة لأكثر من فرد.');
         return;
       }
     }
     if (step === 2) {
       const { rent, electricity, water, gas, transportation } = formData.fixedExpenses;
       if (rent === undefined || electricity === undefined || water === undefined || gas === undefined || transportation === undefined) {
-         setError(lang === 'en' ? 'Required fixed expenses must be filled' : 'يجب ملء المصاريف الثابتة المطلوبة');
+         setErrorMsg(lang === 'en' ? 'Required fixed expenses must be filled' : 'يجب ملء المصاريف الثابتة المطلوبة');
          return;
       }
     }
     setStep(step + 1);
   };
-  const prevStep = () => {
-    setError(null);
-    setStep(step - 1);
-  };
+  const prevStep = () => setStep(step - 1);
 
   const fixedFields = [
     { id: 'rent', required: true },
@@ -219,12 +215,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
         </div>
 
         <div className="p-8 md:p-12">
-          {error && (
-            <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-600 dark:text-rose-400 animate-in slide-in-from-top-2">
-              <X className="w-5 h-5 flex-shrink-0" />
-              <p className="text-sm font-bold font-cairo">{error}</p>
-            </div>
-          )}
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="flex items-center gap-3 mb-2">
@@ -602,6 +592,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang, setLang, them
             </div>
           )}
         </div>
+
+        {errorMsg && (
+          <div className="px-8 pb-4">
+            <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl text-rose-600 dark:text-rose-400 text-sm font-bold flex items-center gap-2 animate-in fade-in">
+              <X className="w-5 h-5" /> {errorMsg}
+            </div>
+          </div>
+        )}
 
         <div className="p-8 border-t border-slate-50 dark:border-slate-800 flex gap-4">
           {step > 1 && (

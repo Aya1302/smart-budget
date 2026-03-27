@@ -2,44 +2,87 @@
   "entities": {
     "UserProfile": {
       "title": "User Profile",
-      "description": "User's financial profile and preferences",
+      "description": "Stores user financial profile and preferences",
       "type": "object",
       "properties": {
         "monthlySalary": { "type": "number" },
+        "age": { "type": "number" },
         "familyMembers": { "type": "number" },
         "maritalStatus": { "type": "string", "enum": ["single", "married", "not_specified"] },
         "livingCostLevel": { "type": "string", "enum": ["High", "Medium", "Low"] },
         "incomeStability": { "type": "string", "enum": ["Full-time", "Freelance", "Seasonal", "Mixed"] },
-        "fixedExpenses": { "type": "object" },
-        "debts": { "type": "array" },
-        "annualExpenses": { "type": "array" },
-        "optionalExpenses": { "type": "object" },
-        "preferences": { "type": "object" }
+        "fixedExpenses": {
+          "type": "object",
+          "properties": {
+            "rent": { "type": "number" },
+            "electricity": { "type": "number" },
+            "water": { "type": "number" },
+            "gas": { "type": "number" },
+            "transportation": { "type": "number" },
+            "internet": { "type": "number" },
+            "mobile": { "type": "number" }
+          }
+        },
+        "debts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "description": { "type": "string" },
+              "monthlyAmount": { "type": "number" },
+              "priority": { "type": "string" },
+              "dueDate": { "type": "string" }
+            }
+          }
+        },
+        "annualExpenses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "description": { "type": "string" },
+              "totalAmount": { "type": "number" },
+              "priority": { "type": "string" },
+              "expectedMonth": { "type": "string" }
+            }
+          }
+        },
+        "optionalExpenses": {
+          "type": "object",
+          "properties": {
+            "streaming": { "type": "number" },
+            "education": { "type": "number" },
+            "medical": { "type": "number" }
+          }
+        },
+        "dailyExpenses": {
+          "type": "object",
+          "properties": {
+            "foodDrink": { "type": "number" },
+            "cafe": { "type": "number" },
+            "medical": { "type": "number" },
+            "travel": { "type": "number" }
+          }
+        },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "savingPriority": { "type": "string" },
+            "riskTolerance": { "type": "string" },
+            "emergencyFundPercentage": { "type": "number" },
+            "monthlyPriorities": { "type": "array", "items": { "type": "string" } }
+          }
+        }
       },
       "required": ["monthlySalary", "familyMembers", "maritalStatus"]
-    },
-    "DailyExpense": {
-      "title": "Daily Expense",
-      "description": "A single daily expense entry",
-      "type": "object",
-      "properties": {
-        "userId": { "type": "string" },
-        "category": { "type": "string", "enum": ["food_drink", "cafe", "medicine", "travel", "other"] },
-        "amount": { "type": "number" },
-        "date": { "type": "string", "format": "date" },
-        "description": { "type": "string" }
-      },
-      "required": ["userId", "category", "amount", "date"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "UserProfile",
-      "description": "User profiles"
-    },
-    "/expenses": {
-      "schema": "DailyExpense",
-      "description": "Daily expenses for all users"
+      "description": "User's private financial data"
     }
   }
 }

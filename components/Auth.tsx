@@ -1,9 +1,8 @@
 
-import React, { useState } from 'react';
-import { Wallet, Chrome, Sun, Moon, Globe, Loader2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Wallet, Mail, Lock, User, ArrowRight, Facebook, Chrome, Eye, EyeOff, Sun, Moon, Globe, Loader2, ChevronLeft, AlertCircle, CheckCircle2, X, PlusCircle } from 'lucide-react';
 import { UserAccount, Language } from '../types';
 import { translations } from '../translations';
-import { auth, googleProvider, signInWithPopup } from '../firebase';
 
 interface AuthProps {
   onLogin: (account: UserAccount) => void;
@@ -13,32 +12,248 @@ interface AuthProps {
   setTheme: (theme: 'light' | 'dark') => void;
 }
 
+const USERS_STORAGE_KEY = 'modaber_mock_users';
+
 const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) => {
   const t = translations[lang];
-  const [isLoading, setIsLoading] = useState(false);
+  const [view, setView] = useState<'login' | 'register' | 'forgot'>('login');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null);
+  const [showAccountPicker, setShowAccountPicker] = useState<'Google' | 'Facebook' | null>(null);
+  const [isManualSocial, setIsManualSocial] = useState(false);
+  const [manualSocialData, setManualSocialData] = useState({ name: '', email: '' });
+  const [isResetSent, setIsResetSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  });
+  const [dbStatus, setDbStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
+  useEffect(() => {
+    setDbStatus('connected'); // Always connected for local storage
+  }, []);
+
+  useEffect(() => {
     setError(null);
+    setSuccess(null);
+  }, [view]);
+
+  const getStoredUsers = () => {
+    const data = localStorage.getItem(USERS_STORAGE_KEY);
+    return data ? JSON.parse(data) : {};
+  };
+
+  const saveUser = (user: any) => {
+    const users = getStoredUsers();
+    users[user.email] = user;
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    if (view === 'forgot') {
+      if (!formData.email) {
+        setError(lang === 'en' ? 'Please enter your email' : 'يرجى إدخال بريدك الإلكتروني');
+        return;
+      }
+      setIsSocialLoading('reset');
+      setTimeout(() => {
+        setIsResetSent(true);
+        setIsSocialLoading(null);
+        setSuccess(lang === 'en' ? 'Verification code sent!' : 'تم إرسال رمز التحقق!');
+      }, 1500);
+      return;
+    }
+
+    if (view === 'register') {
+      try {
+        const users = getStoredUsers();
+        if (users[formData.email]) {
+          setError(t.errorEmailExists);
+          return;
+        }
+        
+        const newUser = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=10b981&color=fff`
+        };
+        
+        saveUser(newUser);
+        setSuccess(t.successRegister);
+        setTimeout(() => setView('login'), 1500);
+      } catch (err) {
+        setError(lang === 'en' ? 'Registration error' : 'خطأ في التسجيل');
+      }
+    } else if (view === 'login') {
+      try {
+        const users = getStoredUsers();
+        const user = users[formData.email];
+        
+        if (user && user.password === formData.password) {
+          onLogin({
+            name: user.name,
+            email: user.email,
+            avatar: user.avatar
+          });
+        } else {
+          setError(t.errorUserNotFound || (lang === 'en' ? 'Invalid credentials' : 'بيانات الدخول غير صحيحة'));
+        }
+      } catch (err) {
+        setError(lang === 'en' ? 'Login error' : 'خطأ في تسجيل الدخول');
+      }
+    }
+  };
+
+  const startSocialAuth = (provider: 'Google' | 'Facebook') => {
+    setIsSocialLoading(provider);
+    // Simulate a more realistic OAuth popup delay
+    setTimeout(() => {
+      setIsSocialLoading(null);
+      setShowAccountPicker(provider);
+      setIsManualSocial(false);
+    }, 1200);
+  };
+
+  const finalizeSocialLogin = async (selectedEmail: string, selectedName: string) => {
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
+      const users = getStoredUsers();
+      let user = users[selectedEmail];
+      
+      if (!user) {
+        user = {
+          name: selectedName,
+          email: selectedEmail,
+          password: 'social-auth-placeholder',
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedName)}&background=${showAccountPicker === 'Google' ? '4285F4' : '333'}&color=fff`
+        };
+        saveUser(user);
+      }
+      
       onLogin({
-        name: user.displayName || 'User',
-        email: user.email || '',
-        avatar: user.photoURL || undefined
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar
       });
-    } catch (err: any) {
-      console.error("Login error:", err);
-      setError(lang === 'en' ? 'Login failed. Please try again.' : 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.');
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error("Social auth error:", err);
+    }
+    setShowAccountPicker(null);
+  };
+
+  const handleManualSocialSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (manualSocialData.email && manualSocialData.name) {
+      finalizeSocialLogin(manualSocialData.email, manualSocialData.name);
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-300 relative">
+      {/* Account Picker Overlay (Simulated OAuth) */}
+      {showAccountPicker && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-in zoom-in duration-300">
+            <div className="p-6 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                {showAccountPicker === 'Google' ? <Chrome className="w-5 h-5 text-blue-500" /> : <Facebook className="w-5 h-5 text-slate-600 dark:text-slate-400" />}
+                <span className="font-bold text-slate-800 dark:text-slate-100">
+                  {isManualSocial ? 'Sign in with different email' : `Sign in with ${showAccountPicker}`}
+                </span>
+              </div>
+              <button onClick={() => setShowAccountPicker(null)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            
+            <div className="p-4 space-y-3">
+              {!isManualSocial ? (
+                <>
+                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase px-2">Choose an account</p>
+                  {[
+                    { name: 'Sami Al-Farsi', email: 'sami.farsi@gmail.com' },
+                    { name: 'Noura Ahmed', email: 'noura.a@outlook.com' },
+                    { name: 'Guest User', email: `guest.${showAccountPicker.toLowerCase()}@example.com` }
+                  ].map((acc, i) => (
+                    <button
+                      key={i}
+                      onClick={() => finalizeSocialLogin(acc.email, acc.name)}
+                      className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-400">
+                        {acc.name[0]}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{acc.name}</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">{acc.email}</p>
+                      </div>
+                    </button>
+                  ))}
+                  <button 
+                    onClick={() => setIsManualSocial(true)}
+                    className="w-full p-3 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center justify-center gap-2"
+                  >
+                    <PlusCircle className="w-4 h-4" /> Use another account
+                  </button>
+                </>
+              ) : (
+                <form onSubmit={handleManualSocialSubmit} className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="Your Name"
+                      value={manualSocialData.name}
+                      onChange={(e) => setManualSocialData({...manualSocialData, name: e.target.value})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                    <input 
+                      type="email" 
+                      required
+                      placeholder="name@provider.com"
+                      value={manualSocialData.email}
+                      onChange={(e) => setManualSocialData({...manualSocialData, email: e.target.value})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      type="button"
+                      onClick={() => setIsManualSocial(false)}
+                      className="flex-1 py-3 border border-slate-100 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      Back
+                    </button>
+                    <button 
+                      type="submit"
+                      className="flex-[2] py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-xs font-black hover:bg-slate-800 dark:hover:bg-emerald-500 transition-colors shadow-lg"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+            
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 text-[10px] text-slate-400 text-center leading-relaxed">
+              To continue, {showAccountPicker} will share your name, email address, and profile picture with {t.appName}.
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pre-auth Toggles */}
       <div className={`absolute top-6 ${lang === 'ar' ? 'left-6' : 'right-6'} flex items-center gap-3 z-50`}>
         <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
@@ -109,10 +324,10 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
         <div className="md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
           <div className="mb-8">
             <h2 className="text-3xl font-black text-slate-800 dark:text-slate-100 mb-2 font-cairo">
-              {t.authWelcomeBack}
+              {view === 'login' ? t.authWelcomeBack : view === 'register' ? t.authCreateAccount : t.forgotPassword}
             </h2>
             <p className="text-slate-500 dark:text-slate-400 font-medium">
-              {t.authLoginDesc}
+              {view === 'login' ? t.authLoginDesc : view === 'register' ? t.authRegisterDesc : t.resetInstructions}
             </p>
           </div>
 
@@ -123,22 +338,212 @@ const Auth: React.FC<AuthProps> = ({ onLogin, lang, setLang, theme, setTheme }) 
             </div>
           )}
 
-          <div className="space-y-6">
-            <button 
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-              className="w-full flex items-center justify-center gap-4 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 py-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all font-black text-slate-700 dark:text-slate-100 shadow-xl shadow-slate-100 dark:shadow-none group"
-            >
-              {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Chrome className="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform" />} 
-              <span className="font-cairo text-lg">{lang === 'en' ? 'Continue with Google' : 'المتابعة باستخدام جوجل'}</span>
-            </button>
-            
-            <p className="text-center text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed px-4">
+          {dbStatus === 'disconnected' && (
+            <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl flex items-center gap-3 text-amber-700 dark:text-amber-400 text-xs font-bold">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {lang === 'en' 
-                ? 'By continuing, you agree to our Terms of Service and Privacy Policy.' 
-                : 'بالمتابعة، فإنك توافق على شروط الخدمة وسياسة الخصوصية الخاصة بنا.'}
-            </p>
-          </div>
+                ? 'Database not connected. Registration will not work until MONGODB_URI is set correctly in secrets.' 
+                : 'قاعدة البيانات غير متصلة. لن يعمل التسجيل حتى يتم ضبط MONGODB_URI بشكل صحيح في الإعدادات.'}
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl flex items-center gap-3 text-emerald-600 dark:text-emerald-400 text-sm font-bold animate-in fade-in slide-in-from-top-2">
+              <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+              {success}
+            </div>
+          )}
+
+          {view === 'forgot' && isResetSent ? (
+            <div className="bg-emerald-50 dark:bg-emerald-500/10 p-8 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-500/20 text-center animate-in zoom-in duration-300 space-y-6">
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
+                <Mail className="w-8 h-8" />
+              </div>
+              <div>
+                <p className="text-emerald-800 dark:text-emerald-400 font-bold text-lg mb-2">
+                  {lang === 'en' ? 'Check your email' : 'افحص بريدك الإلكتروني'}
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  {lang === 'en' 
+                    ? 'A 6-digit code has been sent. It will expire in 10 minutes.' 
+                    : 'تم إرسال رمز مكون من 6 أرقام. ستنتهي صلاحيته خلال 10 دقائق.'}
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block text-left ml-1">
+                  {lang === 'en' ? 'Verification Code' : 'رمز التحقق'}
+                </label>
+                <input 
+                  type="text"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 px-4 text-center text-2xl font-black tracking-[0.5em] outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+                />
+              </div>
+
+              <button 
+                onClick={() => {
+                  if (verificationCode.length === 6) {
+                    setSuccess(lang === 'en' ? 'Code verified! You can now reset your password.' : 'تم التحقق! يمكنك الآن إعادة تعيين كلمة المرور.');
+                    setTimeout(() => {
+                      setView('login');
+                      setIsResetSent(false);
+                      setVerificationCode('');
+                    }, 2000);
+                  } else {
+                    setError(lang === 'en' ? 'Please enter the 6-digit code' : 'يرجى إدخال الرمز المكون من 6 أرقام');
+                  }
+                }}
+                className="w-full bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl py-4 font-black hover:bg-slate-800 dark:hover:bg-emerald-500 transition-all shadow-lg"
+              >
+                {lang === 'en' ? 'Verify Code' : 'تحقق من الرمز'}
+              </button>
+
+              <button 
+                onClick={() => { setView('login'); setIsResetSent(false); setVerificationCode(''); }}
+                className="text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 mx-auto hover:underline text-sm"
+              >
+                <ChevronLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {t.backToLogin}
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {view === 'register' && (
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">{t.fullName}</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600" />
+                    <input 
+                      type="text"
+                      required
+                      placeholder="John Doe"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium dark:text-white"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">{t.emailAddress}</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600" />
+                  <input 
+                    type="email"
+                    required
+                    placeholder="name@company.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {view !== 'forgot' && (
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center ml-1">
+                    <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t.password}</label>
+                    {view === 'login' && (
+                      <button 
+                        type="button" 
+                        onClick={() => setView('forgot')}
+                        className="text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+                      >
+                        {t.forgot}
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600" />
+                    <input 
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl py-4 pl-12 pr-12 focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium dark:text-white"
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 dark:text-slate-600 dark:hover:text-slate-400 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <button 
+                type="submit"
+                disabled={isSocialLoading !== null}
+                className="w-full bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl py-4 font-black flex items-center justify-center gap-2 hover:bg-slate-800 dark:hover:bg-emerald-500 transition-all shadow-xl shadow-slate-100 dark:shadow-none mt-4 group"
+              >
+                {isSocialLoading === 'reset' ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                   <>
+                     {view === 'login' ? t.signIn : view === 'register' ? t.authCreateAccount : t.sendResetLink}
+                     <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${lang === 'ar' ? 'rotate-180' : ''}`} />
+                   </>
+                )}
+              </button>
+
+              {view === 'forgot' && (
+                <button 
+                  type="button"
+                  onClick={() => setView('login')}
+                  className="w-full text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                >
+                  {t.backToLogin}
+                </button>
+              )}
+            </form>
+          )}
+
+          {view !== 'forgot' && (
+            <>
+              <div className="my-8 flex items-center gap-4 text-slate-300 dark:text-slate-700">
+                <hr className="flex-1 border-slate-100 dark:border-slate-800" />
+                <span className="text-xs font-bold uppercase tracking-widest">{t.orContinueWith}</span>
+                <hr className="flex-1 border-slate-100 dark:border-slate-800" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <button 
+                  type="button"
+                  disabled={isSocialLoading !== null}
+                  onClick={() => startSocialAuth('Google')}
+                  className={`flex items-center justify-center gap-2 border border-slate-100 dark:border-slate-800 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-bold text-slate-600 dark:text-slate-400 ${isSocialLoading === 'Google' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}
+                >
+                  {isSocialLoading === 'Google' ? <Loader2 className="w-5 h-5 animate-spin" /> : <Chrome className="w-5 h-5" />} 
+                  Google
+                </button>
+                <button 
+                  type="button"
+                  disabled={isSocialLoading !== null}
+                  onClick={() => startSocialAuth('Facebook')}
+                  className={`flex items-center justify-center gap-2 border border-slate-100 dark:border-slate-800 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-bold text-slate-600 dark:text-slate-400 ${isSocialLoading === 'Facebook' ? 'bg-slate-100 dark:bg-slate-800' : ''}`}
+                >
+                  {isSocialLoading === 'Facebook' ? <Loader2 className="w-5 h-5 animate-spin" /> : <Facebook className="w-5 h-5 text-slate-600 dark:text-slate-400" />} 
+                  Facebook
+                </button>
+              </div>
+
+              <p className="text-center text-slate-500 dark:text-slate-400 font-medium">
+                {view === 'login' ? t.noAccount : t.hasAccount}
+                <button 
+                  type="button"
+                  onClick={() => setView(view === 'login' ? 'register' : 'login')}
+                  className="ml-2 text-emerald-600 dark:text-emerald-400 font-black hover:underline"
+                >
+                  {view === 'login' ? t.createOne : t.signInHere}
+                </button>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -76,6 +76,20 @@ const App: React.FC = () => {
     localStorage.setItem('lang', lang);
   }, [lang]);
 
+  // Initial load from backend if account exists
+  useEffect(() => {
+    const loadFromBackend = async () => {
+      if (account && !profile) {
+        // Fallback to local storage if no backend
+        const savedProfile = localStorage.getItem('modaber_profile');
+        if (savedProfile) {
+          setProfile(JSON.parse(savedProfile));
+        }
+      }
+    };
+    loadFromBackend();
+  }, []);
+
   useEffect(() => {
     if (account) {
       localStorage.setItem('modaber_account', JSON.stringify(account));
@@ -130,9 +144,9 @@ const App: React.FC = () => {
   if (!profile) return <Onboarding onComplete={handleOnboardingComplete} lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} />;
 
   const renderContent = () => {
-    const props = { profile, lang, onUpdate: handleUpdateProfile };
+    const props = { profile, lang };
     switch (activeTab) {
-      case 'dashboard': return <Dashboard {...props} theme={theme} />;
+      case 'dashboard': return <Dashboard {...props} theme={theme} onUpdate={handleUpdateProfile} />;
       case 'budget': return <BudgetPlanner {...props} />;
       case 'prices': return <PriceForecaster {...props} />;
       case 'shopping': return <ShoppingList {...props} />;
@@ -142,7 +156,7 @@ const App: React.FC = () => {
       case 'how-it-works': return <ExtraPages type="how" lang={lang} />;
       case 'privacy': return <ExtraPages type="privacy" lang={lang} />;
       case 'help': return <ExtraPages type="help" lang={lang} />;
-      default: return <Dashboard {...props} theme={theme} />;
+      default: return <Dashboard {...props} theme={theme} onUpdate={handleUpdateProfile} />;
     }
   };
 

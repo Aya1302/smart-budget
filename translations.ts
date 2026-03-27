@@ -78,6 +78,18 @@ export const translations = {
     last6Months: "Last 6 Months",
     fullYear: "Full Year",
     overspendingAlert: "Overspending Alert!",
+    addExpense: "Add Expense",
+    expenseAmount: "Amount",
+    expenseCategory: "Category",
+    expenseDesc: "Description",
+    expenseDate: "Date",
+    foodAndDrinks: "Food & Drinks",
+    cafe: "Cafe",
+    medicalExpense: "Medical",
+    travelExpense: "Travel",
+    otherExpense: "Other",
+    recentExpenses: "Recent Expenses",
+    noRecentExpenses: "No recent expenses recorded.",
 
     // Budget Planner
     smartDistribution: "Smart Distribution",
@@ -207,13 +219,6 @@ export const translations = {
     hasAccount: "Already have an account?",
     createOne: "Create one",
     signInHere: "Sign in here",
-    dailyExpenses: "Daily Expenses",
-    foodDrink: "Food & Drink",
-    cafe: "Cafe",
-    medicalExpense: "Medical",
-    travel: "Travel",
-    addExpense: "Add Expense",
-    amount: "Amount",
     currency: "EGP"
   },
   ar: {
@@ -290,6 +295,18 @@ export const translations = {
     last6Months: "آخر 6 أشهر",
     fullYear: "سنة كاملة",
     overspendingAlert: "تنبيه تجاوز الميزانية!",
+    addExpense: "إضافة مصروف",
+    expenseAmount: "المبلغ",
+    expenseCategory: "الفئة",
+    expenseDesc: "الوصف",
+    expenseDate: "التاريخ",
+    foodAndDrinks: "الأكل والشرب",
+    cafe: "كافيه",
+    medicalExpense: "علاج",
+    travelExpense: "سفر",
+    otherExpense: "أخرى",
+    recentExpenses: "المصاريف الأخيرة",
+    noRecentExpenses: "لم يتم تسجيل مصاريف مؤخراً.",
 
     // Budget Planner
     smartDistribution: "التوزيع الذكي",
@@ -419,13 +436,6 @@ export const translations = {
     hasAccount: "لديك حساب بالفعل؟",
     createOne: "أنشئ حساباً",
     signInHere: "سجل الدخول هنا",
-    dailyExpenses: "المصاريف اليومية",
-    foodDrink: "اكل وشرب",
-    cafe: "كافيه",
-    medicalExpense: "علاج",
-    travel: "سفر",
-    addExpense: "إضافة مصروف",
-    amount: "المبلغ",
     currency: "ج.م"
   }
 };

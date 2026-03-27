@@ -1,6 +1,6 @@
 
 import React, { useMemo } from 'react';
-import { UserProfile, Language } from '../types';
+import { UserProfile, Language, DailyExpense } from '../types';
 import { translations } from '../translations';
 import { 
   TrendingUp, 
@@ -13,12 +13,12 @@ import {
   Target,
   Download,
   Loader2,
+  Plus,
   Coffee,
   Utensils,
   Stethoscope,
   Plane,
-  PlusCircle,
-  ShoppingBag
+  Receipt
 } from 'lucide-react';
 import { generateFullReport } from '../utils/pdfGenerator';
 import { 
@@ -38,43 +38,57 @@ interface DashboardProps {
   profile: UserProfile;
   lang: Language;
   theme: 'light' | 'dark';
-  onUpdate: (profile: UserProfile) => void;
+  onUpdate?: (profile: UserProfile) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme, onUpdate }) => {
   const t = translations[lang];
   const [isGenerating, setIsGenerating] = React.useState(false);
-  const [expenseInputs, setExpenseInputs] = React.useState({
-    foodDrink: '',
-    cafe: '',
-    medical: '',
-    travel: ''
-  });
 
-  const handleAddExpense = (category: keyof NonNullable<UserProfile['dailyExpenses']>) => {
-    const amountStr = expenseInputs[category as keyof typeof expenseInputs];
-    const amount = parseFloat(amountStr);
-    if (isNaN(amount) || amount <= 0) return;
+  const [expenseAmount, setExpenseAmount] = React.useState('');
+  const [expenseCategory, setExpenseCategory] = React.useState<'food' | 'cafe' | 'medical' | 'travel' | 'other'>('food');
+  const [expenseDesc, setExpenseDesc] = React.useState('');
+  const [expenseDate, setExpenseDate] = React.useState(new Date().toISOString().split('T')[0]);
 
-    const currentExpenses = profile.dailyExpenses || {
-      foodDrink: 0,
-      cafe: 0,
-      medical: 0,
-      travel: 0
+  const handleAddExpense = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!expenseAmount || isNaN(Number(expenseAmount))) return;
+
+    const newExpense: DailyExpense = {
+      id: Date.now().toString(),
+      amount: Number(expenseAmount),
+      category: expenseCategory,
+      description: expenseDesc,
+      date: expenseDate,
     };
 
-    const prevValue = (currentExpenses[category] as number) || 0;
-
-    const updatedProfile: UserProfile = {
+    const updatedProfile = {
       ...profile,
-      dailyExpenses: {
-        ...currentExpenses,
-        [category]: prevValue + amount
-      }
+      dailyExpenses: [newExpense, ...(profile.dailyExpenses || [])]
     };
 
-    onUpdate(updatedProfile);
-    setExpenseInputs(prev => ({ ...prev, [category]: '' }));
+    if (onUpdate) {
+      onUpdate(updatedProfile);
+    }
+
+    setExpenseAmount('');
+    setExpenseDesc('');
+  };
+
+  const categoryIcons = {
+    food: Utensils,
+    cafe: Coffee,
+    medical: Stethoscope,
+    travel: Plane,
+    other: Receipt
+  };
+
+  const categoryLabels = {
+    food: t.foodAndDrinks,
+    cafe: t.cafe,
+    medical: t.medicalExpense,
+    travel: t.travelExpense,
+    other: t.otherExpense
   };
 
   const handleDownloadReport = async () => {
@@ -92,31 +106,32 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme, onUpdate })
     (Object.values(profile.fixedExpenses) as number[]).reduce((a, b) => a + b, 0)
   , [profile]);
 
-  const totalDaily = useMemo(() => 
-    profile.dailyExpenses ? (Object.values(profile.dailyExpenses) as number[]).reduce((a, b) => a + b, 0) : 0
-  , [profile]);
+  const totalDailyExpenses = useMemo(() => {
+    if (!profile.dailyExpenses) return 0;
+    return profile.dailyExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  }, [profile.dailyExpenses]);
 
   const totalIncome = profile.monthlySalary;
-  const availableIncome = totalIncome - totalFixed - totalDaily;
+  const availableIncome = totalIncome - totalFixed - totalDailyExpenses;
 
   const mockChartData = [
     { name: 'Jan', expenses: 3200, savings: 800 },
     { name: 'Feb', expenses: 2900, savings: 1100 },
     { name: 'Mar', expenses: 3500, savings: 500 },
-    { name: 'Apr', expenses: totalFixed, savings: availableIncome },
+    { name: 'Apr', expenses: totalFixed + totalDailyExpenses, savings: availableIncome },
   ];
 
   const pieData = [
     { name: t.fixedCosts, value: totalFixed, color: '#10b981' },
-    { name: t.dailyExpenses, value: totalDaily, color: '#f59e0b' },
+    { name: t.recentExpenses, value: totalDailyExpenses, color: '#f59e0b' },
     { name: t.availableCash, value: availableIncome, color: '#94a3b8' },
   ];
 
   const stats = [
     { label: t.totalIncome, value: `${totalIncome} ${t.currency}`, icon: Wallet, color: 'emerald' },
     { label: t.fixedCosts, value: `${totalFixed} ${t.currency}`, icon: TrendingDown, color: 'rose' },
-    { label: t.dailyExpenses, value: `${totalDaily} ${t.currency}`, icon: ShoppingBag, color: 'amber' },
     { label: t.availableCash, value: `${availableIncome} ${t.currency}`, icon: TrendingUp, color: 'blue' },
+    { label: t.financialScore, value: `84/100`, icon: Target, color: 'amber' },
   ];
 
   const monthName = new Date().toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US', { month: 'long' });
@@ -165,58 +180,6 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme, onUpdate })
             <h4 className="text-3xl font-black text-slate-800 dark:text-slate-100">{stat.value}</h4>
           </div>
         ))}
-      </div>
-
-      {/* Daily Expenses Section */}
-      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 font-cairo flex items-center gap-2">
-            <PlusCircle className="w-5 h-5 text-emerald-500" />
-            {t.dailyExpenses}
-          </h3>
-          <div className="text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-700">
-            {t.totalIncome}: {totalDaily} {t.currency}
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { id: 'foodDrink', label: t.foodDrink, icon: Utensils, color: 'orange' },
-            { id: 'cafe', label: t.cafe, icon: Coffee, color: 'amber' },
-            { id: 'medical', label: t.medicalExpense, icon: Stethoscope, color: 'rose' },
-            { id: 'travel', label: t.travel, icon: Plane, color: 'blue' }
-          ].map((cat) => (
-            <div key={cat.id} className="space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <div className={`p-2 rounded-lg bg-${cat.color}-50 dark:bg-${cat.color}-500/10 text-${cat.color}-600 dark:text-${cat.color}-400`}>
-                  <cat.icon className="w-4 h-4" />
-                </div>
-                <span className="text-sm font-bold text-slate-700 dark:text-slate-300 font-cairo">{cat.label}</span>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  placeholder={t.amount}
-                  value={expenseInputs[cat.id as keyof typeof expenseInputs]}
-                  onChange={(e) => setExpenseInputs(prev => ({ ...prev, [cat.id]: e.target.value }))}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-emerald-500 transition-colors text-slate-800 dark:text-white"
-                />
-                <button
-                  onClick={() => handleAddExpense(cat.id as any)}
-                  className="p-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-900/20"
-                >
-                  <PlusCircle className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex justify-between items-center px-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.actual}</span>
-                <span className="text-xs font-black text-slate-700 dark:text-slate-200">
-                  {profile.dailyExpenses?.[cat.id as keyof NonNullable<UserProfile['dailyExpenses']>] || 0} {t.currency}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -281,9 +244,9 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme, onUpdate })
             </div>
             <div className="flex justify-between items-center text-sm p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
               <span className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-bold">
-                <div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm shadow-amber-200" /> {t.dailyExpenses}
+                <div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm shadow-amber-200" /> {t.recentExpenses}
               </span>
-              <span className="font-black text-slate-800 dark:text-slate-100">{totalDaily} {t.currency}</span>
+              <span className="font-black text-slate-800 dark:text-slate-100">{totalDailyExpenses} {t.currency}</span>
             </div>
             <div className="flex justify-between items-center text-sm p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
               <span className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-bold">
@@ -300,6 +263,111 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, lang, theme, onUpdate })
                 {lang === 'en' ? 'Subscription costs increased by 15% this month.' : 'زادت تكاليف الاشتراكات بنسبة 15٪ هذا الشهر.'}
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 font-cairo">{t.addExpense}</h3>
+          <form onSubmit={handleAddExpense} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t.expenseAmount}</label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  required
+                  value={expenseAmount}
+                  onChange={(e) => setExpenseAmount(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-100 font-bold outline-none focus:border-emerald-500 transition-colors"
+                  placeholder="0"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{t.currency}</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t.expenseCategory}</label>
+              <select 
+                value={expenseCategory}
+                onChange={(e) => setExpenseCategory(e.target.value as any)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-100 font-bold outline-none focus:border-emerald-500 transition-colors"
+              >
+                <option value="food">{t.foodAndDrinks}</option>
+                <option value="cafe">{t.cafe}</option>
+                <option value="medical">{t.medicalExpense}</option>
+                <option value="travel">{t.travelExpense}</option>
+                <option value="other">{t.otherExpense}</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t.expenseDesc}</label>
+              <input 
+                type="text" 
+                value={expenseDesc}
+                onChange={(e) => setExpenseDesc(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500 transition-colors"
+                placeholder="..."
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t.expenseDate}</label>
+              <input 
+                type="date" 
+                required
+                value={expenseDate}
+                onChange={(e) => setExpenseDate(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-100 outline-none focus:border-emerald-500 transition-colors"
+              />
+            </div>
+            <button 
+              type="submit"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus className="w-5 h-5" /> {t.addExpense}
+            </button>
+          </form>
+        </div>
+
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 font-cairo">{t.recentExpenses}</h3>
+          
+          <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+            {profile.dailyExpenses && profile.dailyExpenses.length > 0 ? (
+              profile.dailyExpenses.map((expense) => {
+                const Icon = categoryIcons[expense.category] || Receipt;
+                return (
+                  <div key={expense.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-emerald-100 dark:hover:border-emerald-900/30 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 dark:text-slate-100">{categoryLabels[expense.category]}</h4>
+                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                          <span>{expense.date}</span>
+                          {expense.description && (
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                              <span>{expense.description}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-black text-lg text-slate-800 dark:text-slate-100">
+                        {expense.amount} <span className="text-sm text-slate-500 dark:text-slate-400">{t.currency}</span>
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-10 text-slate-500 dark:text-slate-400">
+                <Receipt className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <p>{t.noRecentExpenses}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

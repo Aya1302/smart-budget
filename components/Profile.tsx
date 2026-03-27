@@ -17,6 +17,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
   const [editedProfile, setEditedProfile] = useState<UserProfile>({ ...profile });
   const [showSuccess, setShowSuccess] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleDownloadReport = async () => {
     setIsGenerating(true);
@@ -44,19 +45,20 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
   });
 
   const handleSave = () => {
+    setErrorMsg(null);
     if (!editedProfile.monthlySalary || !editedProfile.familyMembers) {
-      alert(lang === 'en' ? 'Salary and Family Members are required' : 'الراتب وعدد أفراد الأسرة حقول مطلوبة');
+      setErrorMsg(lang === 'en' ? 'Salary and Family Members are required' : 'الراتب وعدد أفراد الأسرة حقول مطلوبة');
       return;
     }
 
     const members = Number(editedProfile.familyMembers);
     const status = editedProfile.maritalStatus;
     if (status === 'married' && members === 1) {
-      alert(t.invalidMaritalStatus);
+      setErrorMsg(lang === 'en' ? 'Marital status "Married" is invalid for 1 family member.' : 'الحالة الاجتماعية "متزوج" غير صحيحة لفرد واحد فقط.');
       return;
     }
     if (status === 'single' && members > 1) {
-      alert(t.invalidMaritalStatus);
+      setErrorMsg(lang === 'en' ? 'Marital status "Single" is invalid for more than 1 family member.' : 'الحالة الاجتماعية "أعزب" غير صحيحة لأكثر من فرد.');
       return;
     }
 
@@ -199,6 +201,12 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
       {showSuccess && (
         <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-4 rounded-2xl flex items-center gap-3 text-emerald-600 dark:text-emerald-400 font-bold animate-in fade-in slide-in-from-top-2">
           <CheckCircle2 className="w-5 h-5" /> {t.profileUpdated}
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 p-4 rounded-2xl flex items-center gap-3 text-rose-600 dark:text-rose-400 font-bold animate-in fade-in slide-in-from-top-2">
+          <X className="w-5 h-5" /> {errorMsg}
         </div>
       )}
 

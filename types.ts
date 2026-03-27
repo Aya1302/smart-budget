@@ -55,6 +55,7 @@ export interface UserProfile {
   };
   debts: Debt[];
   annualExpenses: AnnualExpense[];
+  additionalExpenses?: { id: string; description: string; amount: number }[];
   dailyExpenses?: DailyExpense[];
   optionalExpenses: {
     streaming: number;

@@ -165,3 +165,50 @@ export async function generateShoppingList(profile: UserProfile, budgetLimit: nu
     return [];
   }
 }
+
+export async function processExpenseInput(
+  input: { type: 'image' | 'audio', data: string, mimeType: string },
+  lang: 'en' | 'ar'
+): Promise<{ amount: number, category: string, description: string } | null> {
+  const prompt = `
+    Analyze this ${input.type === 'image' ? 'receipt/image' : 'voice recording'} and extract expense information.
+    The response must be in JSON format with:
+    - amount (number, the total cost found)
+    - category (one of: 'food', 'cafe', 'medical', 'travel', 'other')
+    - description (a short summary of what was bought/spent)
+    
+    If it's a voice recording, the user is describing an expense they just made.
+    If it's an image, it's likely a receipt or a photo of the item.
+    
+    Language for description should be ${lang === 'ar' ? 'Arabic' : 'English'}.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: {
+        parts: [
+          { text: prompt },
+          { inlineData: { data: input.data, mimeType: input.mimeType } }
+        ]
+      },
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            amount: { type: Type.NUMBER },
+            category: { type: Type.STRING },
+            description: { type: Type.STRING }
+          },
+          required: ["amount", "category", "description"]
+        }
+      }
+    });
+
+    return JSON.parse(response.text || 'null');
+  } catch (error) {
+    console.error("AI Expense Processing Error:", error);
+    return null;
+  }
+}

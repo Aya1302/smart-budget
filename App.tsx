@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Wallet, 
+  Receipt,
   TrendingUp, 
   ShoppingBag, 
   BarChart3, 
@@ -22,6 +23,7 @@ import { translations } from './translations';
 import Auth from './components/Auth';
 import Onboarding from './components/Onboarding';
 import Dashboard from './components/Dashboard';
+import Expenses from './components/Expenses';
 import BudgetPlanner from './components/BudgetPlanner';
 import PriceForecaster from './components/PriceForecaster';
 import ShoppingList from './components/ShoppingList';
@@ -126,6 +128,7 @@ const App: React.FC = () => {
 
   const navItems = [
     { id: 'dashboard', label: t.dashboard, icon: LayoutDashboard },
+    { id: 'expenses', label: t.expenses, icon: Receipt },
     { id: 'budget', label: t.smartBudget, icon: Wallet },
     { id: 'prices', label: t.pricePredictions, icon: TrendingUp },
     { id: 'shopping', label: t.smartShopping, icon: ShoppingBag },
@@ -147,6 +150,7 @@ const App: React.FC = () => {
     const props = { profile, lang };
     switch (activeTab) {
       case 'dashboard': return <Dashboard {...props} theme={theme} onUpdate={handleUpdateProfile} />;
+      case 'expenses': return <Expenses {...props} onUpdate={handleUpdateProfile} />;
       case 'budget': return <BudgetPlanner {...props} />;
       case 'prices': return <PriceForecaster {...props} />;
       case 'shopping': return <ShoppingList {...props} />;

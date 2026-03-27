@@ -44,6 +44,12 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
     priority: 'Medium'
   });
 
+  const [showAdditionalForm, setShowAdditionalForm] = useState(false);
+  const [newAdditional, setNewAdditional] = useState({
+    description: '',
+    amount: 0
+  });
+
   const handleSave = () => {
     setErrorMsg(null);
     if (!editedProfile.monthlySalary || !editedProfile.familyMembers) {
@@ -121,12 +127,30 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
     setShowAnnualForm(false);
   };
 
+  const addAdditional = () => {
+    if (!newAdditional.description || !newAdditional.amount) return;
+    const additional = {
+      id: Math.random().toString(36).substring(7),
+      description: newAdditional.description,
+      amount: newAdditional.amount
+    };
+    const currentAdditional = editedProfile.additionalExpenses || [];
+    updateRootField('additionalExpenses', [...currentAdditional, additional]);
+    setNewAdditional({ description: '', amount: 0 });
+    setShowAdditionalForm(false);
+  };
+
   const removeDebt = (id: string) => {
     updateRootField('debts', editedProfile.debts.filter(d => d.id !== id));
   };
 
   const removeAnnual = (id: string) => {
     updateRootField('annualExpenses', editedProfile.annualExpenses.filter(e => e.id !== id));
+  };
+
+  const removeAdditional = (id: string) => {
+    const currentAdditional = editedProfile.additionalExpenses || [];
+    updateRootField('additionalExpenses', currentAdditional.filter(e => e.id !== id));
   };
 
   const movePriority = (index: number, direction: 'up' | 'down') => {
@@ -574,6 +598,54 @@ const Profile: React.FC<ProfileProps> = ({ profile, lang, onUpdate }) => {
                   <div className="flex gap-2">
                     <button onClick={() => setShowAnnualForm(false)} className="flex-1 text-[10px] font-bold text-slate-400">{t.cancel}</button>
                     <button onClick={addAnnual} className="flex-2 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest">{t.addAnnual}</button>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Additional expenses management */}
+            <div className="space-y-4 md:col-span-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Plus className="w-4 h-4 text-emerald-600" /> {t.additionalExpenses}
+                </h4>
+                {isEditing && (
+                  <button onClick={() => setShowAdditionalForm(true)} className="flex items-center gap-1 text-[10px] font-black text-emerald-600 uppercase">
+                    <Plus className="w-3 h-3" /> {t.addAdditionalExpense}
+                  </button>
+                )}
+              </div>
+              <div className="space-y-2">
+                {((isEditing ? editedProfile : profile).additionalExpenses || []).map(e => (
+                  <div key={e.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                    <div>
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{e.description}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.currency} {e.amount}/mo</p>
+                    </div>
+                    {isEditing && (
+                      <button onClick={() => removeAdditional(e.id)} className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {isEditing && showAdditionalForm && (
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 space-y-4 animate-in slide-in-from-top-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="text" placeholder={t.expenseName}
+                      value={newAdditional.description} onChange={e => setNewAdditional({...newAdditional, description: e.target.value})}
+                      className="col-span-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs"
+                    />
+                    <input 
+                      type="number" placeholder={t.monthlyAmount}
+                      value={newAdditional.amount} onChange={e => setNewAdditional({...newAdditional, amount: Number(e.target.value)})}
+                      className="col-span-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowAdditionalForm(false)} className="flex-1 text-[10px] font-bold text-slate-400">{t.cancel}</button>
+                    <button onClick={addAdditional} className="flex-2 py-2 bg-emerald-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest">{t.addAdditionalExpense}</button>
                   </div>
                 </div>
               )}
